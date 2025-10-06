@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database
+*.sqlite
+*.sqlite-journal
+
+# Uploads
+uploads/
+storage/app/uploads/
+storage/app/private/
+
+# Cache
+.cache/
+*.cache
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+storage/logs/
+
+# Compiled files
+*.class
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Package manager locks (keep package.json but ignore some locks for flexibility)
+package-lock.json
+
+# Vite
+packages/web/node_modules/.vite/
+
+# Tesseract data files (large binary files)
+*.traineddata
+
