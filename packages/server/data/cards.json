@@ -1,0 +1,553 @@
+[
+  [
+    "69637b7f-89d3-46f9-990d-ff62af1666b3",
+    {
+      "id": "69637b7f-89d3-46f9-990d-ff62af1666b3",
+      "detail": {
+        "header": {
+          "title": "AI診断プラットフォーム",
+          "companyName": "MedScope",
+          "event": {
+            "id": "event-medtech",
+            "name": "MedTech Summit",
+            "startDate": "2025-03-05",
+            "endDate": "2025-03-07",
+            "location": "Osaka"
+          },
+          "author": {
+            "id": "user-ami",
+            "name": "Ami Sato",
+            "role": "member"
+          },
+          "createdAt": "2025-09-29T23:46:13.462Z",
+          "updatedAt": "2025-09-29T23:46:13.462Z",
+          "priority": 2
+        },
+        "body": {
+          "ocr": {
+            "text": "AIを活用した術前診断、臨床導入数120件。",
+            "updatedAt": "2025-09-29T23:46:13.462Z"
+          },
+          "sourceFiles": [
+            {
+              "id": "69637b7f-89d3-46f9-990d-ff62af1666b3-file",
+              "filename": "69637b7f-89d3-46f9-990d-ff62af1666b3.jpg",
+              "mimeType": "image/jpeg",
+              "bytes": 2048
+            }
+          ],
+          "highlights": [
+            "導入事例を要チェック"
+          ],
+          "tags": [
+            {
+              "id": "medical",
+              "label": "医療"
+            },
+            {
+              "id": "ai",
+              "label": "AI"
+            }
+          ]
+        },
+        "sidebar": {
+          "relatedCards": [],
+          "collections": [],
+          "history": [
+            {
+              "action": "created",
+              "actor": {
+                "id": "user-ami",
+                "name": "Ami Sato",
+                "role": "member"
+              },
+              "at": "2025-09-29T23:46:13.462Z",
+              "details": "カードを作成"
+            }
+          ],
+          "reactions": {
+            "views": 120,
+            "comments": 8,
+            "likes": 8
+          }
+        },
+        "state": "success"
+      },
+      "summary": {
+        "id": "69637b7f-89d3-46f9-990d-ff62af1666b3",
+        "title": "AI診断プラットフォーム",
+        "status": "ready",
+        "thumbnailUrl": "/assets/69637b7f-89d3-46f9-990d-ff62af1666b3.jpg",
+        "eventId": "event-medtech",
+        "tags": [
+          {
+            "id": "medical",
+            "label": "医療"
+          },
+          {
+            "id": "ai",
+            "label": "AI"
+          }
+        ],
+        "createdAt": "2025-09-29T23:46:13.462Z",
+        "createdBy": {
+          "id": "user-ami",
+          "name": "Ami Sato",
+          "role": "member"
+        }
+      },
+      "reactions": {
+        "views": 120,
+        "comments": 8,
+        "likes": 8
+      },
+      "timeseries": [
+        {
+          "date": "2025-09-23",
+          "views": 47,
+          "comments": 0,
+          "likes": 0
+        },
+        {
+          "date": "2025-09-24",
+          "views": 11,
+          "comments": 3,
+          "likes": 4
+        },
+        {
+          "date": "2025-09-25",
+          "views": 17,
+          "comments": 4,
+          "likes": 1
+        },
+        {
+          "date": "2025-09-26",
+          "views": 25,
+          "comments": 2,
+          "likes": 2
+        },
+        {
+          "date": "2025-09-27",
+          "views": 38,
+          "comments": 1,
+          "likes": 0
+        },
+        {
+          "date": "2025-09-28",
+          "views": 33,
+          "comments": 1,
+          "likes": 2
+        },
+        {
+          "date": "2025-09-29",
+          "views": 23,
+          "comments": 4,
+          "likes": 2
+        }
+      ],
+      "audience": [
+        {
+          "department": "営業",
+          "ratio": 0.35
+        },
+        {
+          "department": "企画",
+          "ratio": 0.25
+        },
+        {
+          "department": "開発",
+          "ratio": 0.2
+        },
+        {
+          "department": "その他",
+          "ratio": 0.2
+        }
+      ]
+    }
+  ],
+  [
+    "675c5ca7-154c-4758-a363-86cdd4dd492b",
+    {
+      "id": "675c5ca7-154c-4758-a363-86cdd4dd492b",
+      "detail": {
+        "header": {
+          "title": "協働ロボット T-Assist",
+          "companyName": "Techno Assist",
+          "event": {
+            "id": "event-2025-tokyo",
+            "name": "展示会 2025 TOKYO",
+            "startDate": "2025-02-12",
+            "endDate": "2025-02-15",
+            "location": "Tokyo Big Sight"
+          },
+          "author": {
+            "id": "user-admin",
+            "name": "Admin Imai",
+            "role": "admin"
+          },
+          "createdAt": "2025-09-29T23:46:13.462Z",
+          "updatedAt": "2025-09-29T23:46:13.462Z",
+          "priority": 2
+        },
+        "body": {
+          "ocr": {
+            "text": "軽量で持ち運びが容易、現場での実証実験中。",
+            "updatedAt": "2025-09-29T23:46:13.462Z"
+          },
+          "sourceFiles": [
+            {
+              "id": "675c5ca7-154c-4758-a363-86cdd4dd492b-file",
+              "filename": "675c5ca7-154c-4758-a363-86cdd4dd492b.jpg",
+              "mimeType": "image/jpeg",
+              "bytes": 2048
+            }
+          ],
+          "highlights": [],
+          "tags": [
+            {
+              "id": "robotics",
+              "label": "ロボティクス"
+            },
+            {
+              "id": "event2025",
+              "label": "展示会2025"
+            }
+          ]
+        },
+        "sidebar": {
+          "relatedCards": [],
+          "collections": [],
+          "history": [
+            {
+              "action": "created",
+              "actor": {
+                "id": "user-admin",
+                "name": "Admin Imai",
+                "role": "admin"
+              },
+              "at": "2025-09-29T23:46:13.462Z",
+              "details": "カードを作成"
+            }
+          ],
+          "reactions": {
+            "views": 59,
+            "comments": 9,
+            "likes": 0
+          }
+        },
+        "state": "success"
+      },
+      "summary": {
+        "id": "675c5ca7-154c-4758-a363-86cdd4dd492b",
+        "title": "協働ロボット T-Assist",
+        "status": "ready",
+        "thumbnailUrl": "/assets/675c5ca7-154c-4758-a363-86cdd4dd492b.jpg",
+        "eventId": "event-2025-tokyo",
+        "tags": [
+          {
+            "id": "robotics",
+            "label": "ロボティクス"
+          },
+          {
+            "id": "event2025",
+            "label": "展示会2025"
+          }
+        ],
+        "createdAt": "2025-09-29T23:46:13.462Z",
+        "createdBy": {
+          "id": "user-admin",
+          "name": "Admin Imai",
+          "role": "admin"
+        }
+      },
+      "reactions": {
+        "views": 59,
+        "comments": 9,
+        "likes": 0
+      },
+      "timeseries": [
+        {
+          "date": "2025-09-23",
+          "views": 32,
+          "comments": 2,
+          "likes": 1
+        },
+        {
+          "date": "2025-09-24",
+          "views": 28,
+          "comments": 4,
+          "likes": 5
+        },
+        {
+          "date": "2025-09-25",
+          "views": 15,
+          "comments": 1,
+          "likes": 4
+        },
+        {
+          "date": "2025-09-26",
+          "views": 42,
+          "comments": 3,
+          "likes": 3
+        },
+        {
+          "date": "2025-09-27",
+          "views": 38,
+          "comments": 2,
+          "likes": 3
+        },
+        {
+          "date": "2025-09-28",
+          "views": 38,
+          "comments": 4,
+          "likes": 5
+        },
+        {
+          "date": "2025-09-29",
+          "views": 32,
+          "comments": 1,
+          "likes": 0
+        }
+      ],
+      "audience": [
+        {
+          "department": "営業",
+          "ratio": 0.35
+        },
+        {
+          "department": "企画",
+          "ratio": 0.25
+        },
+        {
+          "department": "開発",
+          "ratio": 0.2
+        },
+        {
+          "department": "その他",
+          "ratio": 0.2
+        }
+      ]
+    }
+  ],
+  [
+    "c7b03868-145b-49bd-b6be-4234c6592217",
+    {
+      "id": "c7b03868-145b-49bd-b6be-4234c6592217",
+      "detail": {
+        "header": {
+          "title": "テスト01",
+          "event": {
+            "id": "event-1759199342631-dhqgtiwb4",
+            "name": "テスト",
+            "startDate": "2025-09-30",
+            "endDate": "2025-10-04"
+          },
+          "author": {
+            "id": "user-ryo",
+            "name": "Ryo Tanamiki",
+            "role": "visitor"
+          },
+          "createdAt": "2025-09-30T02:53:19.372Z",
+          "updatedAt": "2025-09-30T02:53:19.372Z",
+          "priority": 2
+        },
+        "body": {
+          "ocr": {
+            "text": "2. 機能 要件2. 1人材 情報の 一元 化 ・ 見える化2. 1. 1グル ー プご との 絞り込み\n・ 概要: 所属 部習、プロジェクト、役職、動務 地な どのグル ー プ単位で 社員を 絞り込める。・ 詳細要件: ・ 複数の 絞り込み条件を 同時に 指定可能。・ 絞り込み結果は 一覧 表示され、詳細 画面 に違 移可能。・ 絞り込み条件は ユー ザー ごと に保存可能。2. 1. 2メンバー の検索\n・ 概要: 氏名、社員 番号、スキル、経験 年数 など をキー ワー ド検 索で きる。・ 詳細要件: ・ 部分 一致 検索 ・ 完全 一致 検索の 両方を サポ ー ト。・ 結果を「名前 順」「入社 日順」などで ソー ト可 能。・ 検索バックスに オー トコンプリー トを 実装。2. 2人事業務 の効率化\n・ 概要: 社員情報の 登録 ・ 更新 ・ 削除 を効率的 に行う。・ 詳細要件: ・ 登録 ・ 更新: Web管理 画面か ら社 員情報を 入力可能。・ デー タイン ポ ー ト ・ エクスポー ト: CSV形式 での 一括 登録 ・ 出力 に対応。・ 変更履歴: 変更内 容の ログを 保存し、履歴 を閲覧可能。・ 権限管理: 人事 担当 者の み編集可能。閲覧 准限 は管理職 ・ 一般 社員で 制御。2. 3スキル 管理\n・ 概要: 社員の スキル を管理し、適材 身所 の配置を 支援。・ 詳細要件: ・ 社員ご とに スキル 情報 を登録 ・ 更新 可能。・ スキル ごと に社員を 検索 ・ 絞り 込み できる ( 例: Javaが得意な 社員 )。・ スキルレベル (初級中級 / 上級 ) を設定可能。・ スキル マッ プを 可視化し、組織 全体 のスキル 状況 を確認可能。",
+            "updatedAt": "2025-09-30T02:53:19.372Z"
+          },
+          "sourceFiles": [
+            {
+              "id": "c7b03868-145b-49bd-b6be-4234c6592217-file",
+              "filename": "c7b03868-145b-49bd-b6be-4234c6592217.jpg",
+              "mimeType": "image/jpeg",
+              "bytes": 2048
+            }
+          ],
+          "highlights": [
+            "test"
+          ],
+          "tags": [
+            {
+              "id": "test",
+              "label": "test"
+            }
+          ]
+        },
+        "sidebar": {
+          "relatedCards": [],
+          "collections": [],
+          "history": [
+            {
+              "action": "created",
+              "actor": {
+                "id": "user-ryo",
+                "name": "Ryo Tanamiki",
+                "role": "visitor"
+              },
+              "at": "2025-09-30T02:53:19.372Z",
+              "details": "カードを作成"
+            }
+          ],
+          "reactions": {
+            "views": 100,
+            "comments": 1,
+            "likes": 6
+          }
+        },
+        "state": "success"
+      },
+      "summary": {
+        "id": "c7b03868-145b-49bd-b6be-4234c6592217",
+        "title": "テスト01",
+        "status": "ready",
+        "thumbnailUrl": "/assets/c7b03868-145b-49bd-b6be-4234c6592217.jpg",
+        "eventId": "event-1759199342631-dhqgtiwb4",
+        "tags": [
+          {
+            "id": "test",
+            "label": "test"
+          }
+        ],
+        "createdAt": "2025-09-30T02:53:19.372Z",
+        "createdBy": {
+          "id": "user-ryo",
+          "name": "Ryo Tanamiki",
+          "role": "visitor"
+        }
+      },
+      "reactions": {
+        "views": 100,
+        "comments": 1,
+        "likes": 6
+      },
+      "timeseries": [
+        {
+          "date": "2025-09-30",
+          "views": 100,
+          "comments": 1,
+          "likes": 6
+        }
+      ],
+      "audience": [
+        {
+          "department": "営業",
+          "ratio": 0.4
+        },
+        {
+          "department": "開発",
+          "ratio": 0.3
+        },
+        {
+          "department": "企画",
+          "ratio": 0.3
+        }
+      ]
+    }
+  ],
+  [
+    "28867e53-d63e-4b7b-998e-e38db8a26bd0",
+    {
+      "id": "28867e53-d63e-4b7b-998e-e38db8a26bd0",
+      "detail": {
+        "header": {
+          "title": "aaa",
+          "event": {
+            "id": "event-2025-tokyo",
+            "name": "展示会 2025 TOKYO",
+            "startDate": "2025-02-12",
+            "endDate": "2025-02-15",
+            "location": "Tokyo Big Sight"
+          },
+          "author": {
+            "id": "user-ryo",
+            "name": "Ryo Tanamiki",
+            "role": "visitor"
+          },
+          "createdAt": "2025-09-30T04:23:42.945Z",
+          "updatedAt": "2025-09-30T04:23:42.945Z",
+          "priority": 2
+        },
+        "body": {
+          "ocr": {
+            "text": "2. 機能 要件2. 1人材 情報の 一元 化 ・ 見える化2. 1. 1グル ー プご との 絞り込み\n・ 概要: 所属 部習、プロジェクト、役職、動務 地な どのグル ー プ単位で 社員を 絞り込める。・ 詳細要件: ・ 複数の 絞り込み条件を 同時に 指定可能。・ 絞り込み結果は 一覧 表示され、詳細 画面 に違 移可能。・ 絞り込み条件は ユー ザー ごと に保存可能。2. 1. 2メンバー の検索\n・ 概要: 氏名、社員 番号、スキル、経験 年数 など をキー ワー ド検 索で きる。・ 詳細要件: ・ 部分 一致 検索 ・ 完全 一致 検索の 両方を サポ ー ト。・ 結果を「名前 順」「入社 日順」などで ソー ト可 能。・ 検索バックスに オー トコンプリー トを 実装。2. 2人事業務 の効率化\n・ 概要: 社員情報の 登録 ・ 更新 ・ 削除 を効率的 に行う。・ 詳細要件: ・ 登録 ・ 更新: Web管理 画面か ら社 員情報を 入力可能。・ デー タイン ポ ー ト ・ エクスポー ト: CSV形式 での 一括 登録 ・ 出力 に対応。・ 変更履歴: 変更内 容の ログを 保存し、履歴 を閲覧可能。・ 権限管理: 人事 担当 者の み編集可能。閲覧 准限 は管理職 ・ 一般 社員で 制御。2. 3スキル 管理\n・ 概要: 社員の スキル を管理し、適材 身所 の配置を 支援。・ 詳細要件: ・ 社員ご とに スキル 情報 を登録 ・ 更新 可能。・ スキル ごと に社員を 検索 ・ 絞り 込み できる ( 例: Javaが得意な 社員 )。・ スキルレベル (初級中級 / 上級 ) を設定可能。・ スキル マッ プを 可視化し、組織 全体 のスキル 状況 を確認可能。",
+            "updatedAt": "2025-09-30T04:23:42.945Z"
+          },
+          "sourceFiles": [
+            {
+              "id": "28867e53-d63e-4b7b-998e-e38db8a26bd0-file",
+              "filename": "28867e53-d63e-4b7b-998e-e38db8a26bd0.jpg",
+              "mimeType": "image/jpeg",
+              "bytes": 2048
+            }
+          ],
+          "highlights": [],
+          "tags": []
+        },
+        "sidebar": {
+          "relatedCards": [],
+          "collections": [],
+          "history": [
+            {
+              "action": "created",
+              "actor": {
+                "id": "user-ryo",
+                "name": "Ryo Tanamiki",
+                "role": "visitor"
+              },
+              "at": "2025-09-30T04:23:42.945Z",
+              "details": "カードを作成"
+            }
+          ],
+          "reactions": {
+            "views": 203,
+            "comments": 1,
+            "likes": 5
+          }
+        },
+        "state": "success"
+      },
+      "summary": {
+        "id": "28867e53-d63e-4b7b-998e-e38db8a26bd0",
+        "title": "aaa",
+        "status": "ready",
+        "thumbnailUrl": "/assets/28867e53-d63e-4b7b-998e-e38db8a26bd0.jpg",
+        "eventId": "event-2025-tokyo",
+        "tags": [],
+        "createdAt": "2025-09-30T04:23:42.945Z",
+        "createdBy": {
+          "id": "user-ryo",
+          "name": "Ryo Tanamiki",
+          "role": "visitor"
+        }
+      },
+      "reactions": {
+        "views": 203,
+        "comments": 1,
+        "likes": 5
+      },
+      "timeseries": [
+        {
+          "date": "2025-09-30",
+          "views": 203,
+          "comments": 1,
+          "likes": 5
+        }
+      ],
+      "audience": [
+        {
+          "department": "営業",
+          "ratio": 0.4
+        },
+        {
+          "department": "開発",
+          "ratio": 0.3
+        },
+        {
+          "department": "企画",
+          "ratio": 0.3
+        }
+      ]
+    }
+  ]
+]

@@ -1,0 +1,850 @@
+{
+  "meta": {
+    "name": "Insight-Box MVP UI I/O Schema",
+    "version": "1.0.0",
+    "generated_at": "2025-09-26T07:03:01.367403Z",
+    "notes": [
+      "全ての正規表現はクライアント/サーバの両方で検証してください。",
+      "文字数はUTF-16コードユニット想定。日本語入力のサロゲート/結合文字には注意。",
+      "id/uuidはサービス実装に合わせて置換可。"
+    ]
+  },
+  "common": {
+    "patterns": {
+      "id": "^[a-zA-Z0-9_-]{6,64}$",
+      "uuid": "^[0-9a-fA-F-]{36}$",
+      "iso_date": "^\\d{4}-\\d{2}-\\d{2}$",
+      "iso_datetime": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
+      "url": "^(https?)://[^\\s]+$",
+      "email": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "tag": "^[A-Za-z0-9ぁ-んァ-ヶ一-龯ー・‐\\-\\s]{1,30}$",
+      "title": "^[^\\s].{0,119}$",
+      "comment": "^.{1,500}$",
+      "file_ext": "\\.(?:jpe?g|png|pdf)$"
+    },
+    "enums": {
+      "priority": [
+        1,
+        2,
+        3
+      ],
+      "scope": [
+        "team",
+        "org",
+        "link"
+      ],
+      "template_type": [
+        "4P",
+        "SWOT"
+      ],
+      "status": [
+        "pending",
+        "processing",
+        "ready",
+        "failed"
+      ],
+      "sort": [
+        "trending",
+        "latest"
+      ]
+    },
+    "limits": {
+      "file_size_mb_single": 20,
+      "file_size_mb_total": 200,
+      "event_upload_max": 20,
+      "tags_max_per_card": 20,
+      "ocr_text_max": 10000,
+      "title_max": 120,
+      "memo_max": 1000
+    }
+  },
+  "screens": {
+    "Upload.Home": {
+      "inputs": {
+        "search_query": {
+          "type": "string",
+          "maxLength": 120,
+          "pattern": "^.{0,120}$",
+          "required": false
+        },
+        "action_upload": {
+          "type": "boolean",
+          "description": "FABをタップでtrue",
+          "required": false
+        }
+      },
+      "outputs": {
+        "recent_cards": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "properties": {
+              "card_id": {
+                "type": "string",
+                "pattern": "#/common/patterns/id"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "thumbnail_url": {
+                "type": "string",
+                "pattern": "#/common/patterns/url"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "processing",
+                  "ready",
+                  "failed"
+                ]
+              }
+            },
+            "required": [
+              "card_id",
+              "title",
+              "status"
+            ]
+          }
+        },
+        "upload_queue": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "local_id": {
+                "type": "string",
+                "pattern": "#/common/patterns/id"
+              },
+              "filename": {
+                "type": "string",
+                "maxLength": 255,
+                "pattern": ".+#/common/patterns/file_ext"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "processing",
+                  "failed"
+                ]
+              }
+            },
+            "required": [
+              "local_id",
+              "filename",
+              "status"
+            ]
+          }
+        }
+      }
+    },
+    "Upload.Review": {
+      "inputs": {
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": {
+            "$ref": "#/common/limits/event_upload_max"
+          },
+          "items": {
+            "type": "object",
+            "properties": {
+              "filename": {
+                "type": "string",
+                "maxLength": 255,
+                "pattern": ".+#/common/patterns/file_ext"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum_mb": {
+                  "$ref": "#/common/limits/file_size_mb_single"
+                }
+              },
+              "mime": {
+                "type": "string",
+                "enum": [
+                  "image/jpeg",
+                  "image/png",
+                  "application/pdf"
+                ]
+              }
+            },
+            "required": [
+              "filename",
+              "bytes",
+              "mime"
+            ]
+          }
+        },
+        "title": {
+          "type": "string",
+          "maxLength": {
+            "$ref": "#/common/limits/title_max"
+          },
+          "pattern": "#/common/patterns/title",
+          "required": true
+        },
+        "memo": {
+          "type": "string",
+          "maxLength": {
+            "$ref": "#/common/limits/memo_max"
+          },
+          "required": false
+        },
+        "assignee": {
+          "type": "string",
+          "maxLength": 120,
+          "required": false
+        },
+        "priority": {
+          "type": "integer",
+          "enum": {
+            "$ref": "#/common/enums/priority"
+          },
+          "required": false
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": {
+            "$ref": "#/common/limits/tags_max_per_card"
+          },
+          "items": {
+            "type": "string",
+            "pattern": "#/common/patterns/tag"
+          }
+        },
+        "event_id": {
+          "type": "string",
+          "pattern": "#/common/patterns/id",
+          "required": true
+        }
+      },
+      "outputs": {
+        "ocr_text": {
+          "type": "string",
+          "maxLength": {
+            "$ref": "#/common/limits/ocr_text_max"
+          }
+        },
+        "tag_suggestions": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag": {
+                "type": "string",
+                "pattern": "#/common/patterns/tag"
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        "card_id": {
+          "type": "string",
+          "pattern": "#/common/patterns/id"
+        }
+      }
+    },
+    "Upload.BatchImport": {
+      "inputs": {
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": ".+#/common/patterns/file_ext"
+          }
+        },
+        "split_mode": {
+          "type": "string",
+          "enum": [
+            "per_file",
+            "per_page"
+          ],
+          "required": true
+        },
+        "bulk_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "#/common/patterns/tag"
+          }
+        },
+        "bulk_event_id": {
+          "type": "string",
+          "pattern": "#/common/patterns/id",
+          "required": true
+        }
+      },
+      "outputs": {
+        "preview": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_file": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "pages": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "estimated_cards": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "Board.Home": {
+      "inputs": {
+        "query": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "filters": {
+          "type": "object",
+          "properties": {
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "#/common/patterns/tag"
+              }
+            },
+            "event_id": {
+              "type": "string",
+              "pattern": "#/common/patterns/id"
+            },
+            "owner_id": {
+              "type": "string",
+              "pattern": "#/common/patterns/id"
+            },
+            "date_range": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "pattern": "#/common/patterns/iso_date"
+                },
+                "to": {
+                  "type": "string",
+                  "pattern": "#/common/patterns/iso_date"
+                }
+              }
+            }
+          }
+        },
+        "canvas_ops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "op": {
+                "type": "string",
+                "enum": [
+                  "move",
+                  "group",
+                  "label",
+                  "align"
+                ]
+              },
+              "target_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "#/common/patterns/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {
+        "cards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "card_id": {
+                "type": "string",
+                "pattern": "#/common/patterns/id"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "thumbnail_url": {
+                "type": "string",
+                "pattern": "#/common/patterns/url"
+              }
+            }
+          }
+        },
+        "graph": {
+          "type": "object",
+          "properties": {
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                }
+              }
+            },
+            "edges": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  },
+                  "target": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Board.TemplateModal": {
+      "inputs": {
+        "template_type": {
+          "type": "string",
+          "enum": {
+            "$ref": "#/common/enums/template_type"
+          }
+        },
+        "slot_mapping": {
+          "type": "object",
+          "properties": {
+            "4P": {
+              "type": "object",
+              "properties": {
+                "Product": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                },
+                "Price": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                },
+                "Place": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                },
+                "Promotion": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                }
+              }
+            },
+            "SWOT": {
+              "type": "object",
+              "properties": {
+                "Strength": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                },
+                "Weakness": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                },
+                "Opportunity": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                },
+                "Threat": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "#/common/patterns/id"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {
+        "slot_summaries": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "overall_summary": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "synthesis_card_id": {
+          "type": "string",
+          "pattern": "#/common/patterns/id"
+        }
+      }
+    },
+    "Card.Detail": {
+      "inputs": {
+        "title": {
+          "type": "string",
+          "maxLength": {
+            "$ref": "#/common/limits/title_max"
+          },
+          "pattern": "#/common/patterns/title",
+          "required": true
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": {
+            "$ref": "#/common/limits/tags_max_per_card"
+          },
+          "items": {
+            "type": "string",
+            "pattern": "#/common/patterns/tag"
+          }
+        },
+        "comment": {
+          "type": "string",
+          "pattern": "#/common/patterns/comment"
+        }
+      },
+      "outputs": {
+        "ocr_text": {
+          "type": "string",
+          "maxLength": {
+            "$ref": "#/common/limits/ocr_text_max"
+          }
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "#/common/patterns/url"
+          }
+        },
+        "related_cards": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "#/common/patterns/id"
+          }
+        },
+        "stats": {
+          "type": "object",
+          "properties": {
+            "views": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "comments": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "likes": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "Marketplace.Home": {
+      "inputs": {
+        "tab": {
+          "type": "string",
+          "enum": [
+            "following",
+            "trending",
+            "new",
+            "event"
+          ]
+        },
+        "sort": {
+          "type": "string",
+          "enum": {
+            "$ref": "#/common/enums/sort"
+          }
+        }
+      },
+      "outputs": {
+        "cards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "card_id": {
+                "type": "string",
+                "pattern": "#/common/patterns/id"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "author": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "reactions": {
+                "type": "object",
+                "properties": {
+                  "views": {
+                    "type": "integer"
+                  },
+                  "comments": {
+                    "type": "integer"
+                  },
+                  "likes": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Share.Modal": {
+      "inputs": {
+        "scope": {
+          "type": "string",
+          "enum": {
+            "$ref": "#/common/enums/scope"
+          },
+          "default": "team"
+        },
+        "expires_at": {
+          "type": "string",
+          "pattern": "#/common/patterns/iso_date"
+        },
+        "slack": {
+          "type": "object",
+          "properties": {
+            "workspace": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "channel": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "mention": {
+              "type": "string",
+              "pattern": "^@?[A-Za-z0-9_.-]{1,80}$",
+              "required": false
+            }
+          }
+        }
+      },
+      "outputs": {
+        "share_url": {
+          "type": "string",
+          "pattern": "#/common/patterns/url"
+        },
+        "post_result": {
+          "type": "string",
+          "enum": [
+            "posted",
+            "copied_url",
+            "failed"
+          ]
+        }
+      }
+    },
+    "Analytics.Personal": {
+      "inputs": {
+        "range": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string",
+              "pattern": "#/common/patterns/iso_date"
+            },
+            "to": {
+              "type": "string",
+              "pattern": "#/common/patterns/iso_date"
+            }
+          }
+        }
+      },
+      "outputs": {
+        "kpis": {
+          "type": "object",
+          "properties": {
+            "views": {
+              "type": "integer"
+            },
+            "comments": {
+              "type": "integer"
+            },
+            "likes": {
+              "type": "integer"
+            }
+          }
+        },
+        "timeseries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "pattern": "#/common/patterns/iso_date"
+              },
+              "views": {
+                "type": "integer"
+              },
+              "comments": {
+                "type": "integer"
+              },
+              "likes": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Analytics.Card": {
+      "inputs": {
+        "card_id": {
+          "type": "string",
+          "pattern": "#/common/patterns/id"
+        },
+        "range": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string",
+              "pattern": "#/common/patterns/iso_date"
+            },
+            "to": {
+              "type": "string",
+              "pattern": "#/common/patterns/iso_date"
+            }
+          }
+        }
+      },
+      "outputs": {
+        "kpis": {
+          "type": "object",
+          "properties": {
+            "views": {
+              "type": "integer"
+            },
+            "comments": {
+              "type": "integer"
+            },
+            "likes": {
+              "type": "integer"
+            }
+          }
+        },
+        "audience_distribution": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "department": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "ratio": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "Settings.Roles": {
+      "inputs": {
+        "default_scope": {
+          "type": "string",
+          "enum": [
+            "team",
+            "org"
+          ],
+          "default": "team"
+        },
+        "event_upload_max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200,
+          "default": {
+            "$ref": "#/common/limits/event_upload_max"
+          }
+        }
+      },
+      "outputs": {
+        "applied": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

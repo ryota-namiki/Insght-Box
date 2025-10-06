@@ -1,0 +1,9 @@
+[program:server-php-queue]
+command=php /path/to/artisan queue:work --sleep=1 --tries=1 --timeout=120
+directory=/path/to/server-php
+autostart=true
+autorestart=true
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/var/log/laravel-queue.log
+user=www-data
