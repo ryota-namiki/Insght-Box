@@ -725,7 +725,6 @@ export default function UploadPage(): JSX.Element {
               }}
             >
               <h3>{card.title}</h3>
-              <p className={`badge status-${card.status}`}>{card.status}</p>
               <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>{new Date(card.createdAt).toLocaleString()}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {(card.tags ?? []).map((tag, index) => (
