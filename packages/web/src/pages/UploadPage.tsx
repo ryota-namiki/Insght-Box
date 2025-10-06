@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useMemo, useState, useCallback, useRef } from 're
 import { useNavigate, Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import type { EventMeta, Tag } from '@insight-box/core';
-import { createCard, getCards, getEvents, createDocumentFromFile, createDocument, getJob, getDocumentV1, getDocumentText, type CardSummary, type DocumentMeta, type DocumentSource } from '../api/client';
+import { createCard, getCards, getEvents, createDocumentFromFile, createDocument, getJob, getDocumentV1, getDocumentText, summarizeText, type CardSummary, type DocumentMeta, type DocumentSource } from '../api/client';
 import CameraCapture, { CameraCaptureRef } from '../components/CameraCapture';
 
 interface UploadFormState {
@@ -52,6 +52,7 @@ export default function UploadPage(): JSX.Element {
   const [jobProgress, setJobProgress] = useState<number>(0);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const cameraRef = useRef<CameraCaptureRef>(null);
+  const [isAiSummarizing, setIsAiSummarizing] = useState<boolean>(false);
 
   useEffect(() => {
     void loadInitialData();
@@ -223,6 +224,36 @@ export default function UploadPage(): JSX.Element {
     };
 
     checkJob();
+  };
+
+  // AI要約関数
+  const handleAiSummarize = async () => {
+    if (!form.webclipContent && !form.webclipDescription) {
+      setError('要約するテキストがありません');
+      return;
+    }
+
+    setIsAiSummarizing(true);
+    setError(null);
+
+    try {
+      const textToSummarize = form.webclipContent || form.webclipDescription;
+      const result = await summarizeText(textToSummarize, form.title || undefined);
+      
+      if (result.success) {
+        // 要約結果をWebクリップの説明欄に設定
+        setForm((prev) => ({ ...prev, webclipDescription: result.summary }));
+        setSuccessMessage('AI要約が完了しました！');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        setError('AI要約に失敗しました。手動で要約を入力してください。');
+      }
+    } catch (err) {
+      console.error('AI要約エラー:', err);
+      setError(`AI要約エラー: ${(err as Error).message}`);
+    } finally {
+      setIsAiSummarizing(false);
+    }
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -548,6 +579,29 @@ export default function UploadPage(): JSX.Element {
                 value={form.webclipContent}
                 onChange={handleChange('webclipContent')}
               />
+              {(form.webclipContent || form.webclipDescription) && (
+                <button
+                  type="button"
+                  className="button"
+                  onClick={handleAiSummarize}
+                  disabled={isAiSummarizing || loading}
+                  style={{
+                    backgroundColor: '#10b981',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {isAiSummarizing ? '🤖 AI要約中...' : '🤖 AI要約（250字）'}
+                </button>
+              )}
+              {isAiSummarizing && (
+                <p style={{ fontSize: '0.85rem', color: '#6b7280', textAlign: 'center' }}>
+                  AIが内容を250字以内に要約しています...
+                </p>
+              )}
             </>
           )}
 

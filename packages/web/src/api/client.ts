@@ -356,3 +356,14 @@ export async function updateCardPosition(cardId: string, x: number, y: number) {
   });
 }
 
+// AI要約機能
+export async function summarizeText(text: string, title?: string): Promise<{ summary: string; success: boolean }> {
+  return fetchJson<{ summary: string; success: boolean }>('/api/ai/summarize', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ text, title }),
+  });
+}
+

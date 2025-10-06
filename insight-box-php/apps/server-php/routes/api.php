@@ -80,6 +80,40 @@ Route::delete('/events/{id}', function(string $id, EventRepository $events) {
     return response()->json(['deleted' => true]);
 })->name('api.events.destroy');
 
+// AI要約API
+Route::post('/ai/summarize', function(\Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+        'text' => 'required|string|max:50000',
+        'title' => 'nullable|string|max:500'
+    ]);
+    
+    try {
+        $service = new \App\Services\AiSummaryService();
+        
+        if (isset($validated['title'])) {
+            // タイトル + 本文の要約
+            $summary = $service->summarizeWebClip($validated['title'], $validated['text']);
+        } else {
+            // テキストのみの要約
+            $summary = $service->summarize($validated['text']);
+        }
+        
+        return response()->json([
+            'summary' => $summary,
+            'success' => true
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('AI要約APIエラー: ' . $e->getMessage());
+        
+        return response()->json([
+            'error' => $e->getMessage(),
+            'summary' => mb_substr($validated['text'], 0, 247) . '...', // フォールバック
+            'success' => false
+        ], 500);
+    }
+});
+
 // Marketplace API (簡易実装)
 Route::get('/marketplace', function() {
     return response()->json([
