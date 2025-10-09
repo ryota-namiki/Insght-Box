@@ -1,8 +1,45 @@
 # FileZilla アップロードガイド（PHP版）
 
-## 🎉 Node.js不要版のシンプルデプロイ！
+## 🎉 FileZillaだけで完結！SSH不要！
 
-PHP版になったことで、**ビルド不要、Node.js不要**の超シンプルなデプロイが可能になりました！
+PHP版になったことで、**ビルド不要、Node.js不要、SSH不要**の超シンプルなデプロイが可能になりました！
+
+**セットアップウィザード**を使えば、ブラウザから初期設定が完了します。
+
+---
+
+## 🚀 クイックスタート（FileZilla完結版）
+
+### ステップ1: ローカルで準備（1回のみ）
+
+```bash
+cd /Users/ryotanamiki/Desktop/insight-box02/insight-box-php/apps/server-php
+composer install
+```
+
+これで `vendor/` ディレクトリが生成されます。
+
+### ステップ2: FileZillaで全てアップロード
+
+**以下を全部アップロード**（vendor/ も含む）：
+```
+app/, bootstrap/, config/, database/, public/, resources/,
+routes/, storage/, tests/, vendor/, artisan, composer.json, 
+composer.lock, .env.example, setup.php
+```
+
+### ステップ3: ブラウザでセットアップ
+
+```
+https://yourdomain.com/setup.php
+```
+を開いて、画面の指示に従うだけ！
+
+### ステップ4: setup.phpを削除
+
+セットアップ完了後、FileZillaで `public/setup.php` を削除
+
+**完了！** これだけで動作します 🎉
 
 ---
 
@@ -20,41 +57,44 @@ PHP版になったことで、**ビルド不要、Node.js不要**の超シンプ
 
 ---
 
-## 📤 アップロードするもの・しないもの
+## 📤 アップロードするもの（FileZilla完結版）
 
-### ✅ アップロードする（必須）
+### ✅ アップロードする（全部）
 
 ```
 insight-box-php/apps/server-php/
-├── app/                    ✅ PHPコード（コントローラー、モデル、サービス等）
-├── bootstrap/              ✅ Laravelブートストラップ
-├── config/                 ✅ 設定ファイル（必須）
-├── database/
-│   ├── migrations/         ✅ マイグレーションファイル
-│   ├── seeders/            ✅ シーダーファイル
-│   └── factories/          ✅ ファクトリーファイル
-├── public/                 ✅ 公開ディレクトリ（Webルート）
-├── resources/
-│   └── views/              ✅ Bladeテンプレート
-├── routes/                 ✅ ルーティング定義
-├── storage/                ✅ ストレージ（空のディレクトリ構造）
-├── tests/                  ✅ テストファイル（任意）
+├── app/                    ✅ PHPコード
+├── bootstrap/              ✅ ブートストラップ
+├── config/                 ✅ 設定ファイル
+├── database/               ✅ マイグレーション・シーダー
+├── public/                 ✅ 公開ディレクトリ（setup.php含む）
+├── resources/views/        ✅ Bladeテンプレート
+├── routes/                 ✅ ルーティング
+├── storage/                ✅ ストレージ（空ディレクトリ）
+├── tests/                  ✅ テスト
+├── vendor/                 ✅ Composer依存関係（重要！）
 ├── artisan                 ✅ Artisanコマンド
-├── composer.json           ✅ PHP依存関係定義
-├── composer.lock           ✅ 依存関係ロックファイル
+├── composer.json           ✅ 依存関係定義
+├── composer.lock           ✅ ロックファイル
 └── .env.example            ✅ 環境設定サンプル
 ```
 
-### ❌ アップロードしない
+### ⚠️ 注意事項
+
+**`vendor/` を必ずアップロード**してください！
+- ローカルで `composer install` 実行後にアップロード
+- ファイル数: 約3万ファイル
+- サイズ: 約150MB
+- 時間: 10-15分程度
+
+### ❌ アップロードしないもの
 
 ```
-❌ vendor/              サーバーで composer install する
-❌ .env                 サーバーで別途作成する
-❌ database.sqlite      サーバーで新規作成する
+❌ .env                 setup.phpで自動生成
+❌ database.sqlite      setup.phpで自動生成
 ❌ .git/                不要
-❌ .gitignore           任意
 ❌ storage/logs/*.log   ログファイルは不要
-❌ bootstrap/cache/*    キャッシュは不要
+❌ bootstrap/cache/*    キャッシュファイルは不要
 ```
 
 ---
@@ -117,6 +157,21 @@ ln -s /home/username/laravel/public /home/username/public_html
 
 ## 🚀 アップロード手順（ステップバイステップ）
 
+### ステップ0: ローカルで準備（初回のみ）
+
+**ターミナルで以下を実行：**
+
+```bash
+cd /Users/ryotanamiki/Desktop/insight-box02/insight-box-php/apps/server-php
+composer install
+```
+
+これで `vendor/` ディレクトリが生成されます（約150MB、3万ファイル）
+
+**既に vendor/ がある場合はスキップしてOK**
+
+---
+
 ### ステップ1: 左側（ローカル）でフォルダを開く
 
 FileZillaの**左側ペイン**で：
@@ -135,24 +190,33 @@ FileZillaの**右側ペイン**で：
 
 ### ステップ3: アップロードするファイル・フォルダを選択
 
-左側で以下を**Ctrlキー（Cmdキー）を押しながら複数選択**：
+左側で**全て選択**（`Cmd + A` / `Ctrl + A`）
+
+または、以下を**Ctrlキー（Cmdキー）を押しながら複数選択**：
 
 ```
 ✅ app/
 ✅ bootstrap/
 ✅ config/
 ✅ database/
-✅ public/
+✅ public/          ← setup.php が含まれます
 ✅ resources/
 ✅ routes/
 ✅ storage/
 ✅ tests/
+✅ vendor/          ← 重要！必ず含める
 ✅ artisan
 ✅ composer.json
 ✅ composer.lock
 ✅ .env.example
 ✅ phpunit.xml
-✅ README.md
+```
+
+**❌ 除外するもの:**
+```
+❌ .env（あれば）
+❌ .git/
+❌ database.sqlite（あれば）
 ```
 
 ### ステップ4: ドラッグ＆ドロップ
@@ -167,7 +231,52 @@ FileZillaの**右側ペイン**で：
 
 ---
 
-## ⚙️ サーバー上での初期設定（SSH）
+### ステップ6: パーミッション設定（FileZillaで）
+
+パーミッションエラーが出る場合、FileZillaで設定：
+
+1. **右側（サーバー）で `storage` フォルダを右クリック**
+2. **「ファイルのパーミッション」を選択**
+3. **数値: `775`** を入力
+4. **「サブディレクトリに適用」にチェック**
+5. **OK をクリック**
+
+同様に **`bootstrap/cache`** フォルダにも：
+1. 右クリック → ファイルのパーミッション
+2. 数値: `775`
+3. サブディレクトリに適用
+4. OK
+
+---
+
+## ⚙️ セットアップ方法（2つから選択）
+
+### 🌟 方法A: ブラウザセットアップ（SSH不要・推奨）
+
+アップロード完了後：
+
+1. **ブラウザで開く**
+   ```
+   https://yourdomain.com/setup.php
+   ```
+
+2. **画面の指示に従う**
+   - 環境チェック → 次へ
+   - データベース設定を入力
+   - OpenAI API Key を入力（任意）
+   - 「セットアップ実行」をクリック
+
+3. **完了！**
+   - 「Insight-Boxを開く」をクリック
+
+4. **セキュリティ対策**
+   - FileZillaで `public/setup.php` を削除
+
+**所要時間: 3分** ⚡
+
+---
+
+### 方法B: SSH接続（上級者向け）
 
 アップロード完了後、SSHで以下を実行：
 
@@ -420,11 +529,18 @@ php artisan migrate
 
 ## 🚀 初回デプロイ所要時間
 
-- **FileZillaアップロード**: 5分
-- **SSH設定**: 5分
+### 方法A: ブラウザセットアップ（FileZilla完結）
+- **ローカル準備**: 3分（composer install）
+- **FileZillaアップロード**: 10-15分（vendor/含む）
+- **ブラウザセットアップ**: 3分
+- **合計**: **約20分**
+
+### 方法B: SSH使用（高速）
+- **FileZillaアップロード**: 5分（vendor/除く）
+- **SSH設定**: 5分（composer install等）
 - **合計**: **約10分**
 
-Node.js版の1/5以下の時間でデプロイ完了！
+どちらの方法でも、Node.js版（60分以上）より**遥かに高速**です！
 
 ---
 
