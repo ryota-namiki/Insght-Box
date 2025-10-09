@@ -121,28 +121,71 @@ try {
 
 echo '</div>';
 
-// ステップ4: データベースマイグレーション（フレッシュ）
+// ステップ4: データベースファイル削除と再作成
 echo '<div class="p-4 border-2 border-indigo-500 rounded">';
-echo '<h2 class="font-semibold text-indigo-900 mb-2">🗄️ ステップ4: データベース再構築</h2>';
+echo '<h2 class="font-semibold text-indigo-900 mb-2">🗄️ ステップ4: データベース完全再構築（v2）</h2>';
+
+$dbPath = $basePath . '/database/database.sqlite';
 
 try {
-    // データベースをフレッシュにリセットして再作成
-    echo '<p class="text-sm text-blue-600">🔄 データベースをリセット中...</p>';
-    @exec('cd ' . escapeshellarg($basePath) . ' && php artisan migrate:fresh --force 2>&1', $output4, $ret4);
-    
-    if ($ret4 === 0) {
-        echo '<p class="text-sm text-green-600">✅ データベース再構築成功</p>';
-        if (!empty($output4)) {
-            echo '<pre class="text-xs text-gray-600 bg-gray-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
+    // 既存のデータベースファイルを削除
+    if (file_exists($dbPath)) {
+        if (@unlink($dbPath)) {
+            echo '<p class="text-sm text-green-600">✅ 既存のデータベースファイルを削除しました</p>';
+        } else {
+            echo '<p class="text-sm text-yellow-600">⚠️ データベースファイルの削除に失敗（権限を確認してください）</p>';
         }
     } else {
-        echo '<p class="text-sm text-red-600">❌ データベース再構築失敗</p>';
+        echo '<p class="text-sm text-blue-600">ℹ️ データベースファイルは存在しませんでした</p>';
+    }
+    
+    // 新しい空のデータベースファイルを作成
+    if (@touch($dbPath)) {
+        @chmod($dbPath, 0666);
+        echo '<p class="text-sm text-green-600">✅ 新しいデータベースファイルを作成しました (0666)</p>';
+    } else {
+        echo '<p class="text-sm text-red-600">❌ データベースファイルの作成に失敗</p>';
+    }
+    
+    // マイグレーション実行
+    echo '<p class="text-sm text-blue-600">🔄 マイグレーション実行中...</p>';
+    @exec('cd ' . escapeshellarg($basePath) . ' && php artisan migrate --force 2>&1', $output4, $ret4);
+    
+    if ($ret4 === 0) {
+        echo '<p class="text-sm text-green-600">✅ マイグレーション成功</p>';
+        if (!empty($output4)) {
+            $outputText = implode("\n", $output4);
+            // "Nothing to migrate" が含まれているかチェック
+            if (strpos($outputText, 'Nothing to migrate') !== false) {
+                echo '<p class="text-sm text-yellow-600">⚠️ 「Nothing to migrate」- マイグレーションファイルが見つかりません</p>';
+            }
+            echo '<pre class="text-xs text-gray-600 bg-gray-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars($outputText) . '</pre>';
+        }
+    } else {
+        echo '<p class="text-sm text-red-600">❌ マイグレーション失敗</p>';
         if (!empty($output4)) {
             echo '<pre class="text-xs text-red-600 bg-red-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
         }
     }
+    
+    // テーブル一覧を確認
+    if (file_exists($dbPath)) {
+        try {
+            $pdo = new PDO('sqlite:' . $dbPath);
+            $tables = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
+            
+            if (!empty($tables)) {
+                echo '<p class="text-sm text-green-600 mt-2">📋 作成されたテーブル: ' . implode(', ', $tables) . '</p>';
+            } else {
+                echo '<p class="text-sm text-red-600 mt-2">❌ テーブルが1つも作成されていません</p>';
+            }
+        } catch (Exception $e) {
+            echo '<p class="text-sm text-yellow-600 mt-2">⚠️ テーブル確認失敗: ' . htmlspecialchars($e->getMessage()) . '</p>';
+        }
+    }
+    
 } catch (Exception $e) {
-    echo '<p class="text-sm text-red-600">❌ マイグレーション実行エラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p class="text-sm text-red-600">❌ データベース再構築エラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
 }
 
 echo '</div>';
