@@ -312,9 +312,38 @@ $step = $_POST['step'] ?? 'check';
                     file_put_contents(__DIR__ . '/../.env', $envContent);
                     $success[] = '.env ファイルを作成しました';
                     
+                    // SQLiteの場合、データベースファイルが確実に存在することを確認
+                    if ($dbConnection === 'sqlite') {
+                        $dbPath = realpath(__DIR__ . '/../database') . '/database.sqlite';
+                        if (!file_exists($dbPath)) {
+                            file_put_contents($dbPath, ''); // 空ファイルとして作成
+                            @chmod($dbPath, 0664);
+                        }
+                        
+                        if (!file_exists($dbPath)) {
+                            throw new Exception("データベースファイルの作成に失敗しました: {$dbPath}");
+                        }
+                    }
+                    
+                    // 既存のキャッシュをクリア（重要！）
+                    $cacheDirs = [
+                        __DIR__ . '/../bootstrap/cache/config.php',
+                        __DIR__ . '/../bootstrap/cache/routes-v7.php',
+                        __DIR__ . '/../bootstrap/cache/services.php',
+                        __DIR__ . '/../bootstrap/cache/packages.php',
+                    ];
+                    foreach ($cacheDirs as $cacheFile) {
+                        if (file_exists($cacheFile)) {
+                            @unlink($cacheFile);
+                        }
+                    }
+                    
                     // Artisan コマンドを実行
                     $app = require_once __DIR__ . '/../bootstrap/app.php';
                     $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+                    
+                    // 設定をリロード
+                    $kernel->call('config:clear');
                     
                     // マイグレーション実行
                     $kernel->call('migrate', ['--force' => true]);
