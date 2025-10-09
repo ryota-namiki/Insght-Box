@@ -233,6 +233,10 @@ $step = $_POST['step'] ?? 'check';
                     $dbConnection = $_POST['db_connection'] ?? 'sqlite';
                     $openaiKey = $_POST['openai_key'] ?? '';
                     
+                    // プロジェクトルートのパーミッション設定
+                    $projectRoot = realpath(__DIR__ . '/..');
+                    @chmod($projectRoot, 0777);
+                    
                     // パーミッション修正を試みる（777で最大権限）
                     $dirs = [
                         __DIR__ . '/../storage',
@@ -244,6 +248,7 @@ $step = $_POST['step'] ?? 'check';
                         __DIR__ . '/../storage/framework/views',
                         __DIR__ . '/../storage/logs',
                         __DIR__ . '/../bootstrap/cache',
+                        __DIR__ . '/../database',
                     ];
                     
                     foreach ($dirs as $dir) {
@@ -320,11 +325,17 @@ $step = $_POST['step'] ?? 'check';
                     
                     // .env ファイルを保存
                     $envPath = __DIR__ . '/../.env';
-                    if (file_put_contents($envPath, $envContent) === false) {
-                        throw new Exception(".env ファイルの作成に失敗しました。プロジェクトルートディレクトリの書き込み権限を確認してください。");
+                    $envCreated = @file_put_contents($envPath, $envContent);
+                    
+                    if ($envCreated === false) {
+                        // .envの作成に失敗した場合、内容を表示して手動作成を促す
+                        $warnings[] = '.env ファイルの自動作成に失敗しました。以下の内容を手動でコピーして .env ファイルを作成してください。';
+                        $showEnvContent = true;
+                    } else {
+                        @chmod($envPath, 0644);
+                        $success[] = '.env ファイルを作成しました';
+                        $showEnvContent = false;
                     }
-                    @chmod($envPath, 0644);
-                    $success[] = '.env ファイルを作成しました';
                     
                     // bootstrap/cache/ のパーミッション設定
                     $bootstrapCacheDir = __DIR__ . '/../bootstrap/cache';
@@ -387,12 +398,42 @@ $step = $_POST['step'] ?? 'check';
                     </div>
                 <?php endif; ?>
                 
+                <?php if (!empty($warnings)): ?>
+                    <div class="mb-6 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <h3 class="font-semibold text-yellow-900 mb-3">⚠️ 警告</h3>
+                        <?php foreach ($warnings as $msg): ?>
+                            <p class="text-yellow-800 mb-1">⚠️ <?= htmlspecialchars($msg) ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                
                 <?php if (!empty($errors)): ?>
                     <div class="mb-6 p-6 bg-red-50 border border-red-200 rounded-lg">
                         <h3 class="font-semibold text-red-900 mb-3">エラー</h3>
                         <?php foreach ($errors as $msg): ?>
                             <p class="text-red-800 mb-1">❌ <?= htmlspecialchars($msg) ?></p>
                         <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($showEnvContent) && $showEnvContent): ?>
+                    <div class="mb-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h3 class="font-semibold text-blue-900 mb-3">📝 .env ファイルの内容</h3>
+                        <p class="text-blue-800 text-sm mb-3">
+                            以下の内容をコピーして、FileZillaでサーバーのプロジェクトルートに <code>.env</code> ファイルとして保存してください：
+                        </p>
+                        <div class="bg-gray-900 text-green-400 p-4 rounded font-mono text-xs overflow-x-auto">
+                            <pre><?= htmlspecialchars($envContent) ?></pre>
+                        </div>
+                        <div class="mt-4 p-3 bg-white rounded">
+                            <p class="text-sm text-gray-700 font-medium mb-2">手順：</p>
+                            <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+                                <li>上記の内容を全てコピー</li>
+                                <li>ローカルPCで .env ファイルを作成してペースト</li>
+                                <li>FileZillaでサーバーのプロジェクトルート（/home/username/laravel/）にアップロード</li>
+                                <li>このページをリロードして再実行</li>
+                            </ol>
+                        </div>
                     </div>
                 <?php endif; ?>
                 
