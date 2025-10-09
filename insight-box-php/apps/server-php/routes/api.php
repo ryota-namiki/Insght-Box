@@ -114,6 +114,53 @@ Route::post('/ai/summarize', function(\Illuminate\Http\Request $request) {
     }
 });
 
+// Webクリップ API
+Route::post('/webclip/fetch', function(\Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+        'url' => 'required|url|max:2000'
+    ]);
+    
+    try {
+        // Webページを取得
+        $url = $validated['url'];
+        $html = file_get_contents($url, false, stream_context_create([
+            'http' => [
+                'timeout' => 10,
+                'user_agent' => 'Mozilla/5.0 (compatible; InsightBox/1.0)'
+            ]
+        ]));
+        
+        if (!$html) {
+            throw new \Exception('Webページの取得に失敗しました');
+        }
+        
+        // WebClipServiceでメタデータとテキストを抽出
+        $webClipService = app(\App\Services\WebClipService::class);
+        $metadata = $webClipService->extractMetadata($html);
+        $mainText = $webClipService->extractMainText($html);
+        
+        // OpenAI APIで要約を生成
+        $aiService = new \App\Services\AiSummaryService();
+        $summary = $aiService->summarizeWebClip($metadata['title'], $mainText);
+        
+        return response()->json([
+            'success' => true,
+            'title' => $metadata['title'],
+            'description' => $metadata['description'],
+            'summary' => $summary,
+            'content' => mb_substr($mainText, 0, 1000), // 最初の1000文字
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Webクリップエラー: ' . $e->getMessage());
+        
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+});
+
 // Marketplace API (簡易実装)
 Route::get('/marketplace', function() {
     return response()->json([

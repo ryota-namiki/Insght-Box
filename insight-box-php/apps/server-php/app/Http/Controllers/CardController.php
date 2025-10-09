@@ -159,4 +159,147 @@ class CardController extends Controller
         $repo->updatePosition($id, $validated['x'], $validated['y']);
         return response()->json(['success' => true]);
     }
+
+    // === Web用のメソッド ===
+    
+    public function indexWeb(CardRepository $repo)
+    {
+        $cards = $repo->listSummaries();
+        $events = [
+            ['id' => 'dd35200f-c22f-460a-adaf-597acba70bdc', 'name' => 'デフォルトイベント'],
+        ];
+        
+        return view('cards.index', compact('cards', 'events'));
+    }
+
+    public function createWeb()
+    {
+        $events = [
+            ['id' => 'dd35200f-c22f-460a-adaf-597acba70bdc', 'name' => 'デフォルトイベント'],
+        ];
+        
+        return view('cards.create', compact('events'));
+    }
+
+    public function storeWeb(Request $req, CardRepository $repo)
+    {
+        $validated = $req->validate([
+            'title' => 'required|string|max:200',
+            'companyName' => 'nullable|string|max:200',
+            'memo' => 'nullable|string|max:10000',
+            'tags' => 'nullable|array|max:50',
+            'eventId' => 'required|string',
+            'cameraImage' => 'nullable|string',
+            'ocrText' => 'nullable|string|max:50000',
+            'webclipUrl' => 'nullable|string|max:2000',
+            'webclipContent' => 'nullable|string|max:50000',
+            'documentId' => 'nullable|string',
+        ]);
+
+        $cardId = (string) \Illuminate\Support\Str::uuid();
+        
+        $card = [
+            'id' => $cardId,
+            'summary' => [
+                'id' => $cardId,
+                'title' => $validated['title'],
+                'company' => $validated['companyName'] ?? null,
+                'tags' => $validated['tags'] ?? [],
+                'eventId' => $validated['eventId'],
+                'authorId' => null,
+                'status' => 'draft',
+                'createdAt' => now()->toIso8601String(),
+                'updatedAt' => now()->toIso8601String(),
+            ],
+            'detail' => [
+                'id' => $cardId,
+                'memo' => $validated['memo'] ?? null,
+                'text' => $validated['ocrText'] ?? null,
+                'rawText' => $validated['ocrText'] ?? null,
+                'documentId' => $validated['documentId'] ?? null,
+                'cameraImage' => $validated['cameraImage'] ?? null,
+                'webclipUrl' => $validated['webclipUrl'] ?? null,
+                'webclipSummary' => $validated['webclipContent'] ?? null,
+            ],
+            'reactions' => [
+                'likes' => 0,
+                'comments' => 0,
+                'views' => 0,
+            ],
+            'timeseries' => [],
+            'audience' => [],
+        ];
+
+        $repo->upsert($cardId, $card);
+        
+        return redirect()->route('cards.show', $cardId)
+            ->with('success', 'カードが作成されました');
+    }
+
+    public function showWeb(string $id, CardRepository $repo)
+    {
+        $card = $repo->find($id);
+        
+        if (!$card) {
+            abort(404, 'カードが見つかりません');
+        }
+        
+        return view('cards.show', compact('card'));
+    }
+
+    public function editWeb(string $id, CardRepository $repo)
+    {
+        $card = $repo->find($id);
+        
+        if (!$card) {
+            abort(404, 'カードが見つかりません');
+        }
+        
+        $events = [
+            ['id' => 'dd35200f-c22f-460a-adaf-597acba70bdc', 'name' => 'デフォルトイベント'],
+        ];
+        
+        return view('cards.edit', compact('card', 'events'));
+    }
+
+    public function updateWeb(string $id, Request $req, CardRepository $repo)
+    {
+        $validated = $req->validate([
+            'title' => 'required|string|max:200',
+            'companyName' => 'nullable|string|max:200',
+            'memo' => 'nullable|string|max:10000',
+            'tags' => 'nullable|array|max:50',
+            'eventId' => 'required|string',
+        ]);
+        
+        $card = $repo->find($id);
+        if (!$card) {
+            abort(404, 'カードが見つかりません');
+        }
+        
+        $card['summary']['title'] = $validated['title'];
+        $card['summary']['company'] = $validated['companyName'] ?? null;
+        $card['summary']['tags'] = $validated['tags'] ?? [];
+        $card['summary']['eventId'] = $validated['eventId'];
+        $card['detail']['memo'] = $validated['memo'] ?? null;
+        $card['summary']['updatedAt'] = now()->toIso8601String();
+        
+        $repo->upsert($id, $card);
+        
+        return redirect()->route('cards.show', $id)
+            ->with('success', 'カードが更新されました');
+    }
+
+    public function destroyWeb(string $id, CardRepository $repo)
+    {
+        $card = $repo->find($id);
+        if (!$card) {
+            abort(404, 'カードが見つかりません');
+        }
+        
+        $repo->delete($id);
+        
+        return redirect()->route('cards.index')
+            ->with('success', 'カードが削除されました');
+    }
 }
