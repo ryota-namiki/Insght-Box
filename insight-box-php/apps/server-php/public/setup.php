@@ -273,10 +273,17 @@ $step = $_POST['step'] ?? 'check';
                         
                         // データベースディレクトリが存在することを確認
                         if (!is_dir($dbDir)) {
-                            mkdir($dbDir, 0775, true);
+                            @mkdir($dbDir, 0775, true);
+                        }
+                        @chmod($dbDir, 0775);
+                        
+                        // 絶対パスを取得（realpath前にディレクトリ存在を確保）
+                        $dbDirReal = realpath($dbDir);
+                        if (!$dbDirReal) {
+                            throw new Exception("database/ ディレクトリが見つかりません");
                         }
                         
-                        $dbPath = realpath($dbDir) . '/database.sqlite';
+                        $dbPath = $dbDirReal . '/database.sqlite';
                         
                         // データベースファイルを作成
                         if (!file_exists($dbPath)) {
@@ -284,14 +291,9 @@ $step = $_POST['step'] ?? 'check';
                             @chmod($dbPath, 0664);
                         }
                         
-                        // パーミッション確認
-                        if (!is_writable($dbPath)) {
-                            @chmod($dbPath, 0664);
-                        }
-                        
                         $envContent = preg_replace('/^DB_CONNECTION=.*/m', 'DB_CONNECTION=sqlite', $envContent);
                         $envContent = preg_replace('/^DB_DATABASE=.*/m', "DB_DATABASE={$dbPath}", $envContent);
-                        $success[] = "SQLiteデータベースを作成しました: {$dbPath}";
+                        $success[] = "SQLiteデータベースパスを設定しました: {$dbPath}";
                     } else {
                         $dbDatabase = $_POST['db_database'] ?? '';
                         $dbUsername = $_POST['db_username'] ?? '';
@@ -317,33 +319,6 @@ $step = $_POST['step'] ?? 'check';
                     // .env ファイルを保存
                     file_put_contents(__DIR__ . '/../.env', $envContent);
                     $success[] = '.env ファイルを作成しました';
-                    
-                    // SQLiteの場合、データベースファイルが確実に存在することを確認
-                    if ($dbConnection === 'sqlite') {
-                        $dbDir = __DIR__ . '/../database';
-                        
-                        // databaseディレクトリ確認
-                        if (!is_dir($dbDir)) {
-                            mkdir($dbDir, 0775, true);
-                        }
-                        
-                        $dbPath = realpath($dbDir) . '/database.sqlite';
-                        
-                        // データベースファイル作成
-                        if (!file_exists($dbPath)) {
-                            file_put_contents($dbPath, '');
-                            @chmod($dbPath, 0664);
-                        }
-                        
-                        // 最終確認
-                        if (!file_exists($dbPath)) {
-                            throw new Exception("データベースファイルの作成に失敗しました。database/ ディレクトリの書き込み権限を確認してください。パス: {$dbPath}");
-                        }
-                        
-                        if (!is_writable($dbPath)) {
-                            @chmod($dbPath, 0664);
-                        }
-                    }
                     
                     // 既存のキャッシュをクリア（重要！）
                     $cacheDirs = [
