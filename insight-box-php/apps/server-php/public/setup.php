@@ -269,18 +269,24 @@ $step = $_POST['step'] ?? 'check';
                     
                     // データベース設定
                     if ($dbConnection === 'sqlite') {
-                        $dbPath = realpath(__DIR__ . '/../database') . '/database.sqlite';
+                        $dbDir = __DIR__ . '/../database';
                         
                         // データベースディレクトリが存在することを確認
-                        $dbDir = dirname($dbPath);
                         if (!is_dir($dbDir)) {
                             mkdir($dbDir, 0775, true);
                         }
                         
+                        $dbPath = realpath($dbDir) . '/database.sqlite';
+                        
                         // データベースファイルを作成
                         if (!file_exists($dbPath)) {
-                            touch($dbPath);
-                            chmod($dbPath, 0664);
+                            file_put_contents($dbPath, '');
+                            @chmod($dbPath, 0664);
+                        }
+                        
+                        // パーミッション確認
+                        if (!is_writable($dbPath)) {
+                            @chmod($dbPath, 0664);
                         }
                         
                         $envContent = preg_replace('/^DB_CONNECTION=.*/m', 'DB_CONNECTION=sqlite', $envContent);
@@ -314,14 +320,28 @@ $step = $_POST['step'] ?? 'check';
                     
                     // SQLiteの場合、データベースファイルが確実に存在することを確認
                     if ($dbConnection === 'sqlite') {
-                        $dbPath = realpath(__DIR__ . '/../database') . '/database.sqlite';
+                        $dbDir = __DIR__ . '/../database';
+                        
+                        // databaseディレクトリ確認
+                        if (!is_dir($dbDir)) {
+                            mkdir($dbDir, 0775, true);
+                        }
+                        
+                        $dbPath = realpath($dbDir) . '/database.sqlite';
+                        
+                        // データベースファイル作成
                         if (!file_exists($dbPath)) {
-                            file_put_contents($dbPath, ''); // 空ファイルとして作成
+                            file_put_contents($dbPath, '');
                             @chmod($dbPath, 0664);
                         }
                         
+                        // 最終確認
                         if (!file_exists($dbPath)) {
-                            throw new Exception("データベースファイルの作成に失敗しました: {$dbPath}");
+                            throw new Exception("データベースファイルの作成に失敗しました。database/ ディレクトリの書き込み権限を確認してください。パス: {$dbPath}");
+                        }
+                        
+                        if (!is_writable($dbPath)) {
+                            @chmod($dbPath, 0664);
                         }
                     }
                     
