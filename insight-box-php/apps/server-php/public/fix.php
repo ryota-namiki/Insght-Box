@@ -121,30 +121,63 @@ try {
 
 echo '</div>';
 
-// ステップ4: イベント作成（存在しない場合）
+// ステップ4: データベースマイグレーション
+echo '<div class="p-4 border-2 border-indigo-500 rounded">';
+echo '<h2 class="font-semibold text-indigo-900 mb-2">🗄️ ステップ4: データベースマイグレーション</h2>';
+
+try {
+    @exec('cd ' . escapeshellarg($basePath) . ' && php artisan migrate --force 2>&1', $output4, $ret4);
+    
+    if ($ret4 === 0) {
+        echo '<p class="text-sm text-green-600">✅ マイグレーション成功</p>';
+        if (!empty($output4)) {
+            echo '<pre class="text-xs text-gray-600 bg-gray-50 p-2 rounded mt-2">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
+        }
+    } else {
+        echo '<p class="text-sm text-red-600">❌ マイグレーション失敗</p>';
+        if (!empty($output4)) {
+            echo '<pre class="text-xs text-red-600 bg-red-50 p-2 rounded mt-2">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
+        }
+    }
+} catch (Exception $e) {
+    echo '<p class="text-sm text-red-600">❌ マイグレーション実行エラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
+}
+
+echo '</div>';
+
+// ステップ5: イベント作成（存在しない場合）
 echo '<div class="p-4 border-2 border-green-500 rounded">';
-echo '<h2 class="font-semibold text-green-900 mb-2">📋 ステップ4: デフォルトイベント確認</h2>';
+echo '<h2 class="font-semibold text-green-900 mb-2">📋 ステップ5: デフォルトイベント確認</h2>';
 
 try {
     require_once $basePath . '/vendor/autoload.php';
     $app = require_once $basePath . '/bootstrap/app.php';
     $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
     
-    $eventExists = DB::table('events')->where('id', 'default-event')->exists();
+    // テーブルの存在確認
+    $tables = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name='events'");
     
-    if (!$eventExists) {
-        DB::table('events')->insert([
-            'id' => 'default-event',
-            'name' => 'デフォルトイベント',
-            'description' => 'システム作成',
-            'start_date' => now(),
-            'end_date' => now()->addYear(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        echo '<p class="text-sm text-green-600">✅ デフォルトイベントを作成しました</p>';
+    if (empty($tables)) {
+        echo '<p class="text-sm text-red-600">❌ eventsテーブルが存在しません（マイグレーションを確認してください）</p>';
     } else {
-        echo '<p class="text-sm text-blue-600">ℹ️ デフォルトイベントは既に存在します</p>';
+        echo '<p class="text-sm text-green-600">✅ eventsテーブルが存在します</p>';
+        
+        $eventExists = DB::table('events')->where('id', 'default-event')->exists();
+        
+        if (!$eventExists) {
+            DB::table('events')->insert([
+                'id' => 'default-event',
+                'name' => 'デフォルトイベント',
+                'description' => 'システム作成',
+                'start_date' => now(),
+                'end_date' => now()->addYear(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            echo '<p class="text-sm text-green-600">✅ デフォルトイベントを作成しました</p>';
+        } else {
+            echo '<p class="text-sm text-blue-600">ℹ️ デフォルトイベントは既に存在します</p>';
+        }
     }
 } catch (Exception $e) {
     echo '<p class="text-sm text-yellow-600">⚠️ イベント確認失敗: ' . htmlspecialchars($e->getMessage()) . '</p>';
