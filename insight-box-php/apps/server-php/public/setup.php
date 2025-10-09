@@ -233,7 +233,7 @@ $step = $_POST['step'] ?? 'check';
                     $dbConnection = $_POST['db_connection'] ?? 'sqlite';
                     $openaiKey = $_POST['openai_key'] ?? '';
                     
-                    // パーミッション修正を試みる
+                    // パーミッション修正を試みる（777で最大権限）
                     $dirs = [
                         __DIR__ . '/../storage',
                         __DIR__ . '/../storage/app',
@@ -248,12 +248,12 @@ $step = $_POST['step'] ?? 'check';
                     
                     foreach ($dirs as $dir) {
                         if (file_exists($dir)) {
-                            @chmod($dir, 0775);
+                            @chmod($dir, 0777); // セットアップ時は最大権限
                         } else {
-                            @mkdir($dir, 0775, true);
+                            @mkdir($dir, 0777, true);
                         }
                     }
-                    $success[] = 'ディレクトリのパーミッションを設定しました';
+                    $success[] = 'ディレクトリのパーミッションを設定しました（777）';
                     
                     // .env ファイルを作成
                     $envContent = file_get_contents(__DIR__ . '/../.env.example');
@@ -287,8 +287,10 @@ $step = $_POST['step'] ?? 'check';
                         
                         // データベースファイルを作成
                         if (!file_exists($dbPath)) {
-                            file_put_contents($dbPath, '');
-                            @chmod($dbPath, 0664);
+                            if (file_put_contents($dbPath, '') === false) {
+                                throw new Exception("データベースファイルの作成に失敗しました。database/ ディレクトリのパーミッションを777に設定してください。");
+                            }
+                            @chmod($dbPath, 0666); // 全員が読み書き可能
                         }
                         
                         $envContent = preg_replace('/^DB_CONNECTION=.*/m', 'DB_CONNECTION=sqlite', $envContent);
@@ -317,8 +319,16 @@ $step = $_POST['step'] ?? 'check';
                     }
                     
                     // .env ファイルを保存
-                    file_put_contents(__DIR__ . '/../.env', $envContent);
+                    $envPath = __DIR__ . '/../.env';
+                    if (file_put_contents($envPath, $envContent) === false) {
+                        throw new Exception(".env ファイルの作成に失敗しました。プロジェクトルートディレクトリの書き込み権限を確認してください。");
+                    }
+                    @chmod($envPath, 0644);
                     $success[] = '.env ファイルを作成しました';
+                    
+                    // bootstrap/cache/ のパーミッション設定
+                    $bootstrapCacheDir = __DIR__ . '/../bootstrap/cache';
+                    @chmod($bootstrapCacheDir, 0777); // 一時的に全権限
                     
                     // 既存のキャッシュをクリア（重要！）
                     $cacheDirs = [
@@ -344,14 +354,18 @@ $step = $_POST['step'] ?? 'check';
                     $kernel->call('migrate', ['--force' => true]);
                     $success[] = 'データベースマイグレーションを実行しました';
                     
-                    // キャッシュ最適化
-                    $kernel->call('config:cache');
-                    $kernel->call('route:cache');
-                    $kernel->call('view:cache');
-                    $success[] = 'キャッシュを最適化しました';
+                    // キャッシュ最適化（エラーが出ても続行）
+                    try {
+                        $kernel->call('config:cache');
+                        $kernel->call('route:cache');
+                        $kernel->call('view:cache');
+                        $success[] = 'キャッシュを最適化しました';
+                    } catch (\Exception $e) {
+                        $warnings[] = 'キャッシュ最適化をスキップしました（パーミッション不足）。アプリケーションは動作します。';
+                    }
                     
                     // セットアップ完了フラグを作成
-                    file_put_contents($setupCompleteFile, date('Y-m-d H:i:s'));
+                    @file_put_contents($setupCompleteFile, date('Y-m-d H:i:s'));
                     
                     $setupComplete = true;
                     
@@ -394,10 +408,16 @@ $step = $_POST['step'] ?? 'check';
                         
                         <div class="bg-yellow-50 border border-yellow-300 rounded p-4 mb-6">
                             <p class="text-yellow-900 font-medium mb-2">⚠️ 重要：セキュリティ対策</p>
-                            <p class="text-yellow-800 text-sm">
-                                このファイル（setup.php）を<strong>必ず削除</strong>してください！<br>
-                                FileZillaで接続して、public/setup.php を削除してください。
-                            </p>
+                            <div class="text-yellow-800 text-sm space-y-2">
+                                <p>✅ <strong>このファイル（setup.php）を必ず削除</strong>してください！</p>
+                                <p>✅ セットアップ時に設定した<strong>777パーミッションを775に戻す</strong>ことを推奨（任意）：</p>
+                                <ul class="list-disc list-inside ml-4 space-y-1">
+                                    <li>storage/ → 775</li>
+                                    <li>bootstrap/cache/ → 775</li>
+                                    <li>database/ → 775</li>
+                                </ul>
+                                <p class="mt-2">FileZillaで接続して、各フォルダを右クリック → パーミッション変更</p>
+                            </div>
                         </div>
                         
                         <div class="flex gap-3">
