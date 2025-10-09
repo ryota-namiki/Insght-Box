@@ -190,42 +190,76 @@ try {
 
 echo '</div>';
 
-// ステップ5: イベント作成（存在しない場合）
+// ステップ5: eventsテーブル作成とデフォルトイベント
 echo '<div class="p-4 border-2 border-green-500 rounded">';
-echo '<h2 class="font-semibold text-green-900 mb-2">📋 ステップ5: デフォルトイベント確認</h2>';
+echo '<h2 class="font-semibold text-green-900 mb-2">📋 ステップ5: eventsテーブルとデフォルトイベント作成</h2>';
 
 try {
-    require_once $basePath . '/vendor/autoload.php';
-    $app = require_once $basePath . '/bootstrap/app.php';
-    $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
-    
-    // テーブルの存在確認
-    $tables = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name='events'");
-    
-    if (empty($tables)) {
-        echo '<p class="text-sm text-red-600">❌ eventsテーブルが存在しません（マイグレーションを確認してください）</p>';
-    } else {
-        echo '<p class="text-sm text-green-600">✅ eventsテーブルが存在します</p>';
+    // PDOで直接テーブルを作成
+    if (file_exists($dbPath)) {
+        $pdo = new PDO('sqlite:' . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        $eventExists = DB::table('events')->where('id', 'default-event')->exists();
+        // eventsテーブルの存在確認
+        $tableExists = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='events'")->fetchColumn();
+        
+        if (!$tableExists) {
+            echo '<p class="text-sm text-blue-600">🔧 eventsテーブルを作成中...</p>';
+            
+            // eventsテーブルを作成
+            $pdo->exec("
+                CREATE TABLE events (
+                    id TEXT PRIMARY KEY NOT NULL,
+                    name TEXT NOT NULL,
+                    description TEXT,
+                    start_date TEXT NOT NULL,
+                    end_date TEXT NOT NULL,
+                    created_at TEXT,
+                    updated_at TEXT
+                )
+            ");
+            
+            echo '<p class="text-sm text-green-600">✅ eventsテーブルを作成しました</p>';
+        } else {
+            echo '<p class="text-sm text-green-600">✅ eventsテーブルは既に存在します</p>';
+        }
+        
+        // デフォルトイベントの確認と作成
+        $eventExists = $pdo->query("SELECT COUNT(*) FROM events WHERE id = 'default-event'")->fetchColumn();
         
         if (!$eventExists) {
-            DB::table('events')->insert([
-                'id' => 'default-event',
-                'name' => 'デフォルトイベント',
-                'description' => 'システム作成',
-                'start_date' => now(),
-                'end_date' => now()->addYear(),
-                'created_at' => now(),
-                'updated_at' => now(),
+            $now = date('Y-m-d H:i:s');
+            $endDate = date('Y-m-d H:i:s', strtotime('+1 year'));
+            
+            $stmt = $pdo->prepare("
+                INSERT INTO events (id, name, description, start_date, end_date, created_at, updated_at)
+                VALUES (:id, :name, :description, :start_date, :end_date, :created_at, :updated_at)
+            ");
+            
+            $stmt->execute([
+                ':id' => 'default-event',
+                ':name' => 'デフォルトイベント',
+                ':description' => 'システム作成',
+                ':start_date' => $now,
+                ':end_date' => $endDate,
+                ':created_at' => $now,
+                ':updated_at' => $now,
             ]);
+            
             echo '<p class="text-sm text-green-600">✅ デフォルトイベントを作成しました</p>';
         } else {
             echo '<p class="text-sm text-blue-600">ℹ️ デフォルトイベントは既に存在します</p>';
         }
+        
+        // イベント数を確認
+        $eventCount = $pdo->query("SELECT COUNT(*) FROM events")->fetchColumn();
+        echo '<p class="text-sm text-gray-600 mt-2">📊 イベント数: ' . $eventCount . '件</p>';
+        
+    } else {
+        echo '<p class="text-sm text-red-600">❌ データベースファイルが見つかりません</p>';
     }
 } catch (Exception $e) {
-    echo '<p class="text-sm text-yellow-600">⚠️ イベント確認失敗: ' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p class="text-sm text-red-600">❌ エラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
 }
 
 echo '</div>';
