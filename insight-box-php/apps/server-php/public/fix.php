@@ -25,42 +25,68 @@ echo '<!DOCTYPE html>
             <div class="space-y-3">';
 
 try {
+    // データベースファイルのパーミッション修正
+    $dbPath = __DIR__ . '/../database/database.sqlite';
+    if (file_exists($dbPath)) {
+        @chmod($dbPath, 0666); // 読み書き可能に
+        echo '<p class="text-green-700">✅ データベースファイルのパーミッションを修正（666）</p>';
+    }
+    
+    // データベースディレクトリのパーミッション
+    $dbDir = __DIR__ . '/../database';
+    @chmod($dbDir, 0777);
+    echo '<p class="text-green-700">✅ database/ ディレクトリのパーミッションを修正（777）</p>';
+    
     $app = require_once __DIR__ . '/../bootstrap/app.php';
     $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
     
     echo '<p class="text-green-700">✅ Laravel起動成功</p>';
     
-    // キャッシュクリア
-    $kernel->call('config:clear');
-    echo '<p class="text-green-700">✅ config:clear 実行</p>';
+    // キャッシュファイルを直接削除（Artisanコマンドを使わない）
+    $cacheFiles = [
+        __DIR__ . '/../bootstrap/cache/config.php',
+        __DIR__ . '/../bootstrap/cache/routes-v7.php',
+        __DIR__ . '/../bootstrap/cache/services.php',
+        __DIR__ . '/../bootstrap/cache/packages.php',
+    ];
     
-    $kernel->call('route:clear');
-    echo '<p class="text-green-700">✅ route:clear 実行</p>';
+    foreach ($cacheFiles as $file) {
+        if (file_exists($file)) {
+            @unlink($file);
+            echo '<p class="text-green-700">✅ キャッシュ削除: ' . basename($file) . '</p>';
+        }
+    }
     
-    $kernel->call('view:clear');
-    echo '<p class="text-green-700">✅ view:clear 実行</p>';
-    
-    $kernel->call('cache:clear');
-    echo '<p class="text-green-700">✅ cache:clear 実行</p>';
+    // ビューキャッシュディレクトリをクリア
+    $viewCacheDir = __DIR__ . '/../storage/framework/views';
+    if (is_dir($viewCacheDir)) {
+        $files = glob($viewCacheDir . '/*');
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                @unlink($file);
+            }
+        }
+        echo '<p class="text-green-700">✅ ビューキャッシュをクリア</p>';
+    }
     
     // ストレージディレクトリ作成
     $storageDirs = [
-        storage_path('app/data'),
-        storage_path('framework/cache/data'),
-        storage_path('framework/sessions'),
-        storage_path('framework/views'),
-        storage_path('logs'),
+        __DIR__ . '/../storage/app/data',
+        __DIR__ . '/../storage/framework/cache/data',
+        __DIR__ . '/../storage/framework/sessions',
+        __DIR__ . '/../storage/framework/views',
+        __DIR__ . '/../storage/logs',
     ];
     
     foreach ($storageDirs as $dir) {
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-            echo '<p class="text-blue-700">📁 作成: ' . basename($dir) . '</p>';
+            @mkdir($dir, 0777, true);
+            echo '<p class="text-blue-700">📁 作成: ' . str_replace(__DIR__ . '/../storage/', '', $dir) . '</p>';
         }
     }
     
     // デフォルトイベントを作成
-    $eventsJsonPath = storage_path('app/data/events.json');
+    $eventsJsonPath = __DIR__ . '/../storage/app/data/events.json';
     if (!file_exists($eventsJsonPath)) {
         $defaultEvents = [
             'dd35200f-c22f-460a-adaf-597acba70bdc' => [
