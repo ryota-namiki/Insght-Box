@@ -121,22 +121,24 @@ try {
 
 echo '</div>';
 
-// ステップ4: データベースマイグレーション
+// ステップ4: データベースマイグレーション（フレッシュ）
 echo '<div class="p-4 border-2 border-indigo-500 rounded">';
-echo '<h2 class="font-semibold text-indigo-900 mb-2">🗄️ ステップ4: データベースマイグレーション</h2>';
+echo '<h2 class="font-semibold text-indigo-900 mb-2">🗄️ ステップ4: データベース再構築</h2>';
 
 try {
-    @exec('cd ' . escapeshellarg($basePath) . ' && php artisan migrate --force 2>&1', $output4, $ret4);
+    // データベースをフレッシュにリセットして再作成
+    echo '<p class="text-sm text-blue-600">🔄 データベースをリセット中...</p>';
+    @exec('cd ' . escapeshellarg($basePath) . ' && php artisan migrate:fresh --force 2>&1', $output4, $ret4);
     
     if ($ret4 === 0) {
-        echo '<p class="text-sm text-green-600">✅ マイグレーション成功</p>';
+        echo '<p class="text-sm text-green-600">✅ データベース再構築成功</p>';
         if (!empty($output4)) {
-            echo '<pre class="text-xs text-gray-600 bg-gray-50 p-2 rounded mt-2">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
+            echo '<pre class="text-xs text-gray-600 bg-gray-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
         }
     } else {
-        echo '<p class="text-sm text-red-600">❌ マイグレーション失敗</p>';
+        echo '<p class="text-sm text-red-600">❌ データベース再構築失敗</p>';
         if (!empty($output4)) {
-            echo '<pre class="text-xs text-red-600 bg-red-50 p-2 rounded mt-2">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
+            echo '<pre class="text-xs text-red-600 bg-red-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
         }
     }
 } catch (Exception $e) {
