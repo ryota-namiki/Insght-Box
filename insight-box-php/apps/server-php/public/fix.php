@@ -164,7 +164,7 @@ try {
         echo '<p class="text-sm text-red-600">❌ データベースファイルの作成に失敗</p>';
     }
     
-    // マイグレーション実行
+    // マイグレーション実行（エラーが出ても続行）
     echo '<p class="text-sm text-blue-600">🔄 マイグレーション実行中...</p>';
     @exec('cd ' . escapeshellarg($basePath) . ' && php artisan migrate --force 2>&1', $output4, $ret4);
     
@@ -179,9 +179,14 @@ try {
             echo '<pre class="text-xs text-gray-600 bg-gray-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars($outputText) . '</pre>';
         }
     } else {
-        echo '<p class="text-sm text-red-600">❌ マイグレーション失敗</p>';
+        echo '<p class="text-sm text-yellow-600">⚠️ マイグレーション一部失敗（続行します）</p>';
         if (!empty($output4)) {
-            echo '<pre class="text-xs text-red-600 bg-red-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars(implode("\n", $output4)) . '</pre>';
+            $outputText = implode("\n", $output4);
+            // eventsテーブルのエラーの場合は警告レベル
+            if (strpos($outputText, 'no such table: events') !== false) {
+                echo '<p class="text-sm text-blue-600">ℹ️ eventsテーブルはステップ5で作成します</p>';
+            }
+            echo '<pre class="text-xs text-yellow-600 bg-yellow-50 p-2 rounded mt-2 overflow-auto max-h-40">' . htmlspecialchars($outputText) . '</pre>';
         }
     }
     
