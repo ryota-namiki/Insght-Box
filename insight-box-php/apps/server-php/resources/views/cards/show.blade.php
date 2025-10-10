@@ -122,7 +122,7 @@
                             <!-- 画像プレビュー（APIから取得） -->
                             <div class="mt-3">
                                 <img 
-                                    src="/api/v1/documents/{{ $card['detail']['documentId'] }}/image" 
+                                    src="{{ url('/api/v1/documents/' . $card['detail']['documentId'] . '/image') }}" 
                                     alt="アップロードファイル"
                                     class="w-full h-auto rounded-lg shadow-md"
                                     id="preview-image"
