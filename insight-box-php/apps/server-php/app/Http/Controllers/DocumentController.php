@@ -65,6 +65,8 @@ class DocumentController extends Controller
             $jobs->updateStatus($jobId, 'running', 1);
             
             $text = '';
+            $ocrError = null;
+            
             if ($sourceType === 'upload') {
                 $path = storage_path("app/private/{$storedPath}");
                 \Log::info("OCR対象ファイル: {$path}");
@@ -74,19 +76,27 @@ class DocumentController extends Controller
                     throw new \Exception("アップロードファイルが見つかりません: {$path}");
                 }
                 
-                if (preg_match('/\.pdf$/i', $path)) {
-                    $pages = $pdfService->pdfToImages($path);
-                    $total = max(count($pages), 1);
-                    $i = 0;
-                    foreach ($pages as $img) {
-                        $text .= $ocrService->imageToText($img, $validated['lang'] ?? 'jpn+eng');
-                        $i++;
-                        $jobs->updateProgress($jobId, intval($i / $total * 98));
+                try {
+                    if (preg_match('/\.pdf$/i', $path)) {
+                        $pages = $pdfService->pdfToImages($path);
+                        $total = max(count($pages), 1);
+                        $i = 0;
+                        foreach ($pages as $img) {
+                            $text .= $ocrService->imageToText($img, $validated['lang'] ?? 'jpn+eng');
+                            $i++;
+                            $jobs->updateProgress($jobId, intval($i / $total * 98));
+                        }
+                    } else {
+                        \Log::info("画像OCR処理実行中...");
+                        $text = $ocrService->imageOrTextToText($path, $validated['lang'] ?? 'jpn+eng');
+                        \Log::info("OCR結果テキスト長: " . mb_strlen($text));
+                        $jobs->updateProgress($jobId, 90);
                     }
-                } else {
-                    \Log::info("画像OCR処理実行中...");
-                    $text = $ocrService->imageOrTextToText($path, $validated['lang'] ?? 'jpn+eng');
-                    \Log::info("OCR結果テキスト長: " . mb_strlen($text));
+                } catch (\Exception $ocrException) {
+                    // OCRエラー（Tesseractがインストールされていない等）をキャッチ
+                    \Log::warning("OCR処理をスキップ: " . $ocrException->getMessage());
+                    $ocrError = $ocrException->getMessage();
+                    $text = "[OCR処理エラー]\n\nサーバーにTesseract OCRがインストールされていないため、テキスト抽出ができませんでした。\n\n画像ファイルは正常にアップロードされています。\nファイルプレビューとカメラ撮影機能は正常に動作します。";
                     $jobs->updateProgress($jobId, 90);
                 }
             } else {
