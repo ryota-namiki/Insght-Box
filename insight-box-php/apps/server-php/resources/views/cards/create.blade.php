@@ -429,12 +429,25 @@ function cardFormMain() {
             setTimeout(async () => {
                 try {
                     const response = await fetch(`{{ url("/api/v1/documents") }}/${this.documentId}/text`);
+                    console.log('OCRテキスト取得レスポンス:', response.status);
+                    
                     if (response.ok) {
                         const data = await response.json();
-                        this.extractedText = data.text || 'テキスト抽出完了';
+                        console.log('OCRテキストデータ:', data);
+                        
+                        if (data.text && data.text.trim()) {
+                            this.extractedText = data.text;
+                        } else {
+                            this.extractedText = 'OCR処理が完了しましたが、テキストが抽出できませんでした。\n画像の品質を確認するか、別の画像をお試しください。';
+                        }
+                    } else {
+                        const errorText = await response.text();
+                        console.error('テキスト取得失敗:', errorText);
+                        this.extractedText = `エラー: ${response.status} - テキスト取得に失敗しました`;
                     }
                 } catch (error) {
                     console.error('テキスト取得エラー:', error);
+                    this.extractedText = `エラー: ${error.message}`;
                 }
             }, 2000);
         },
