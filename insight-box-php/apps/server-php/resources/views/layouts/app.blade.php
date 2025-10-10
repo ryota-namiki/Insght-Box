@@ -61,17 +61,21 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('cards.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('cards.index') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
+                    <a href="{{ route('cards.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('cards.*') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
                         <span class="material-icons text-sm mr-1">list</span>
-                        一覧
+                        カード
                     </a>
-                    <a href="{{ route('board.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('board.index') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
+                    <a href="{{ route('board.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('board.*') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
                         <span class="material-icons text-sm mr-1">dashboard</span>
                         ボード
                     </a>
+                    <a href="{{ route('events.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('events.*') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
+                        <span class="material-icons text-sm mr-1">event</span>
+                        イベント
+                    </a>
                     <a href="{{ route('cards.create') }}" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">
                         <span class="material-icons text-sm mr-1">add</span>
-                        新規作成
+                        カード作成
                     </a>
                 </div>
             </div>

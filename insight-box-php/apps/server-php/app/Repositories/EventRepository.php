@@ -2,50 +2,23 @@
 
 namespace App\Repositories;
 
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class EventRepository
 {
-    private string $path = 'data/events.json';
-
-    /**
-     * @return array<string,mixed>
-     */
-    private function read(): array
-    {
-        $fullPath = storage_path('app/' . $this->path);
-        if (!file_exists($fullPath)) {
-            return [];
-        }
-        
-        $json = file_get_contents($fullPath);
-        return $json ? json_decode($json, true) : [];
-    }
-
-    /**
-     * @param array<string,mixed> $data
-     */
-    private function write(array $data): void
-    {
-        $fullPath = storage_path('app/' . $this->path);
-        $dir = dirname($fullPath);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        
-        file_put_contents(
-            $fullPath,
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-        );
-    }
-
     /**
      * @return array<int,array<string,mixed>>
      */
     public function list(): array
     {
-        $all = $this->read();
-        return array_values($all);
+        $events = DB::table('events')
+            ->orderBy('start_date', 'desc')
+            ->get()
+            ->toArray();
+        
+        return array_map(function($event) {
+            return (array) $event;
+        }, $events);
     }
 
     /**
@@ -53,8 +26,9 @@ class EventRepository
      */
     public function find(string $id): ?array
     {
-        $all = $this->read();
-        return $all[$id] ?? null;
+        $event = DB::table('events')->where('id', $id)->first();
+        
+        return $event ? (array) $event : null;
     }
 
     /**
@@ -62,9 +36,15 @@ class EventRepository
      */
     public function create(array $event): void
     {
-        $all = $this->read();
-        $all[$event['id']] = $event;
-        $this->write($all);
+        DB::table('events')->insert([
+            'id' => $event['id'],
+            'name' => $event['name'],
+            'description' => $event['description'] ?? null,
+            'start_date' => $event['startDate'] ?? $event['start_date'],
+            'end_date' => $event['endDate'] ?? $event['end_date'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**
@@ -72,17 +52,34 @@ class EventRepository
      */
     public function update(string $id, array $event): void
     {
-        $all = $this->read();
-        if (isset($all[$id])) {
-            $all[$id] = array_merge($all[$id], $event);
-            $this->write($all);
+        $data = [
+            'updated_at' => now(),
+        ];
+        
+        if (isset($event['name'])) {
+            $data['name'] = $event['name'];
         }
+        if (isset($event['description'])) {
+            $data['description'] = $event['description'];
+        }
+        if (isset($event['startDate'])) {
+            $data['start_date'] = $event['startDate'];
+        }
+        if (isset($event['start_date'])) {
+            $data['start_date'] = $event['start_date'];
+        }
+        if (isset($event['endDate'])) {
+            $data['end_date'] = $event['endDate'];
+        }
+        if (isset($event['end_date'])) {
+            $data['end_date'] = $event['end_date'];
+        }
+        
+        DB::table('events')->where('id', $id)->update($data);
     }
 
     public function delete(string $id): void
     {
-        $all = $this->read();
-        unset($all[$id]);
-        $this->write($all);
+        DB::table('events')->where('id', $id)->delete();
     }
 }
