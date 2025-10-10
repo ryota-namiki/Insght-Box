@@ -145,7 +145,7 @@ function boardManager() {
         
         async savePosition(card) {
             try {
-                const response = await fetch(`/api/cards/${card.id}/position`, {
+                const response = await fetch(`{{ url('/api/cards') }}/${card.id}/position`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
