@@ -434,11 +434,16 @@ function cardFormMain() {
                     if (response.ok) {
                         const data = await response.json();
                         console.log('OCRテキストデータ:', data);
+                        console.log('data.text:', data.text);
+                        console.log('data.textの型:', typeof data.text);
+                        console.log('data.textの長さ:', data.text ? data.text.length : 'null/undefined');
                         
                         if (data.text && data.text.trim()) {
                             this.extractedText = data.text;
                         } else {
-                            this.extractedText = 'OCR処理が完了しましたが、テキストが抽出できませんでした。\n画像の品質を確認するか、別の画像をお試しください。';
+                            this.extractedText = 'OCR処理が完了しましたが、テキストが抽出できませんでした。\n\n【デバッグ情報】\n' + 
+                                               'レスポンス: ' + JSON.stringify(data, null, 2) + '\n\n' +
+                                               '※サーバーにTesseract OCRがインストールされていない可能性があります。';
                         }
                     } else {
                         const errorText = await response.text();

@@ -121,12 +121,40 @@
                     ?>
                 </div>
                 
+                <!-- 最新のLaravelログ -->
+                <div class="bg-yellow-50 p-4 rounded">
+                    <h2 class="font-semibold mb-3">📋 最新のログ（最後の100行）</h2>
+                    <?php
+                    $logPath = __DIR__ . '/../storage/logs/laravel.log';
+                    if (file_exists($logPath)) {
+                        $lines = file($logPath);
+                        $lastLines = array_slice($lines, -100);
+                        echo '<pre class="text-xs bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto max-h-96 overflow-y-auto">';
+                        foreach ($lastLines as $line) {
+                            if (strpos($line, 'ERROR') !== false) {
+                                echo '<span class="text-red-400">' . htmlspecialchars($line) . '</span>';
+                            } elseif (strpos($line, 'WARNING') !== false) {
+                                echo '<span class="text-yellow-400">' . htmlspecialchars($line) . '</span>';
+                            } elseif (strpos($line, 'INFO') !== false) {
+                                echo '<span class="text-blue-400">' . htmlspecialchars($line) . '</span>';
+                            } else {
+                                echo htmlspecialchars($line);
+                            }
+                        }
+                        echo '</pre>';
+                    } else {
+                        echo '<p class="text-gray-600">ログファイルが見つかりません</p>';
+                    }
+                    ?>
+                </div>
+                
                 <!-- 推奨アクション -->
                 <div class="bg-indigo-50 p-4 rounded">
                     <h2 class="font-semibold mb-3">🎯 次のステップ</h2>
                     <ol class="list-decimal list-inside space-y-2 text-sm">
                         <li>エラーがなければ、<a href="/" class="text-indigo-600 hover:underline">Insight-Boxを開く</a></li>
                         <li>エラーがあれば、上記のログを確認</li>
+                        <li>OCR処理のログを確認（青い "INFO" 行を探す）</li>
                         <li>このファイル（debug.php）を削除</li>
                         <li>setup.phpも削除されているか確認</li>
                     </ol>

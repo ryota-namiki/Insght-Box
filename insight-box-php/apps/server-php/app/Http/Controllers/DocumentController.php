@@ -56,6 +56,8 @@ class DocumentController extends Controller
 
         // 同期的に OCR 処理を実行（テスト用）
         try {
+            \Log::info("OCR処理開始: documentId={$documentId}, sourceType={$sourceType}");
+            
             $ocrService = app(\App\Services\OcrService::class);
             $pdfService = app(\App\Services\PdfService::class);
             $webClipService = app(\App\Services\WebClipService::class);
@@ -65,6 +67,13 @@ class DocumentController extends Controller
             $text = '';
             if ($sourceType === 'upload') {
                 $path = storage_path("app/private/{$storedPath}");
+                \Log::info("OCR対象ファイル: {$path}");
+                \Log::info("ファイル存在確認: " . (file_exists($path) ? 'YES' : 'NO'));
+                
+                if (!file_exists($path)) {
+                    throw new \Exception("アップロードファイルが見つかりません: {$path}");
+                }
+                
                 if (preg_match('/\.pdf$/i', $path)) {
                     $pages = $pdfService->pdfToImages($path);
                     $total = max(count($pages), 1);
@@ -75,7 +84,9 @@ class DocumentController extends Controller
                         $jobs->updateProgress($jobId, intval($i / $total * 98));
                     }
                 } else {
+                    \Log::info("画像OCR処理実行中...");
                     $text = $ocrService->imageOrTextToText($path, $validated['lang'] ?? 'jpn+eng');
+                    \Log::info("OCR結果テキスト長: " . mb_strlen($text));
                     $jobs->updateProgress($jobId, 90);
                 }
             } else {
@@ -90,9 +101,15 @@ class DocumentController extends Controller
                 $jobs->updateProgress($jobId, 90);
             }
             
+            \Log::info("OCR処理完了: テキスト長={$text ? mb_strlen($text) : 0}");
+            
             $docs->updateText($documentId, $text);
             $jobs->updateStatus($jobId, 'succeeded', 100);
+            
+            \Log::info("ドキュメントテキスト保存完了: documentId={$documentId}");
         } catch (\Throwable $e) {
+            \Log::error("OCR処理エラー: " . $e->getMessage());
+            \Log::error("スタックトレース: " . $e->getTraceAsString());
             $jobs->fail($jobId, $e->getMessage());
         }
 
