@@ -22,28 +22,45 @@ $basePath = realpath(__DIR__ . '/..');
 
 echo '<div class="space-y-4">';
 
-// ステップ1: データベースファイルの権限修正
+// ステップ1: データベースファイルとストレージディレクトリの権限修正
 echo '<div class="p-4 border-2 border-blue-500 rounded">';
-echo '<h2 class="font-semibold text-blue-900 mb-2">📁 ステップ1: データベースファイル</h2>';
+echo '<h2 class="font-semibold text-blue-900 mb-2">📁 ステップ1: ファイルシステム権限</h2>';
 
+// database.sqlite
 $dbPath = $basePath . '/database/database.sqlite';
 if (file_exists($dbPath)) {
     $currentPerms = substr(sprintf('%o', fileperms($dbPath)), -4);
-    echo '<p class="text-sm text-gray-600">現在: ' . $currentPerms . '</p>';
+    echo '<p class="text-sm text-gray-600">database.sqlite: ' . $currentPerms . '</p>';
     
     if (@chmod($dbPath, 0666)) {
         echo '<p class="text-sm text-green-600">✅ database.sqlite を 0666 に変更</p>';
-    } else {
-        echo '<p class="text-sm text-red-600">❌ 変更失敗</p>';
     }
-} else {
-    echo '<p class="text-sm text-yellow-600">⚠️ database.sqlite が見つかりません</p>';
 }
 
-// database/ ディレクトリ自体
+// database/ ディレクトリ
 $dbDir = $basePath . '/database';
 if (@chmod($dbDir, 0777)) {
     echo '<p class="text-sm text-green-600">✅ database/ を 0777 に変更</p>';
+}
+
+// storage/app/data/ ディレクトリ（JSON保存用）
+$dataDir = $basePath . '/storage/app/data';
+if (!file_exists($dataDir)) {
+    @mkdir($dataDir, 0777, true);
+    echo '<p class="text-sm text-green-600">✅ storage/app/data/ を作成しました</p>';
+} else {
+    @chmod($dataDir, 0777);
+    echo '<p class="text-sm text-green-600">✅ storage/app/data/ のパーミッションを設定</p>';
+}
+
+// storage/app/private/ ディレクトリ（アップロードファイル用）
+$privateDir = $basePath . '/storage/app/private';
+if (!file_exists($privateDir)) {
+    @mkdir($privateDir, 0777, true);
+    echo '<p class="text-sm text-green-600">✅ storage/app/private/ を作成しました</p>';
+} else {
+    @chmod($privateDir, 0777);
+    echo '<p class="text-sm text-green-600">✅ storage/app/private/ のパーミッションを設定</p>';
 }
 
 echo '</div>';
