@@ -46,6 +46,24 @@
             @enderror
         </div>
 
+        <!-- 場所 -->
+        <div class="mb-6">
+            <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
+                場所
+            </label>
+            <input 
+                type="text" 
+                id="location" 
+                name="location" 
+                value="{{ old('location', $event['location'] ?? '') }}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 @error('location') border-red-500 @enderror" 
+                placeholder="例: 東京ビッグサイト"
+            >
+            @error('location')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+
         <!-- 開始日と終了日 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <!-- 開始日 -->

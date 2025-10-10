@@ -28,6 +28,9 @@
                         イベント名
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        場所
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         開始日
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -47,6 +50,18 @@
                         <td class="px-6 py-4">
                             <div class="text-sm font-medium text-gray-900">
                                 {{ $event['name'] }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-500">
+                                @if(isset($event['location']) && $event['location'])
+                                    <span class="inline-flex items-center">
+                                        <span class="material-icons text-xs mr-1">place</span>
+                                        {{ $event['location'] }}
+                                    </span>
+                                @else
+                                    -
+                                @endif
                             </div>
                         </td>
                         <td class="px-6 py-4">

@@ -24,6 +24,7 @@ class EventController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:200',
             'description' => 'nullable|string|max:1000',
+            'location' => 'nullable|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
@@ -34,6 +35,7 @@ class EventController extends Controller
             'id' => $eventId,
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
+            'location' => $validated['location'] ?? null,
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
         ];
@@ -60,6 +62,7 @@ class EventController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:200',
             'description' => 'nullable|string|max:1000',
+            'location' => 'nullable|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
@@ -67,6 +70,7 @@ class EventController extends Controller
         $repo->update($id, [
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
+            'location' => $validated['location'] ?? null,
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
         ]);

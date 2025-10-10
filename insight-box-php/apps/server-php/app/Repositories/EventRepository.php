@@ -40,6 +40,7 @@ class EventRepository
             'id' => $event['id'],
             'name' => $event['name'],
             'description' => $event['description'] ?? null,
+            'location' => $event['location'] ?? null,
             'start_date' => $event['startDate'] ?? $event['start_date'],
             'end_date' => $event['endDate'] ?? $event['end_date'],
             'created_at' => now(),
@@ -61,6 +62,9 @@ class EventRepository
         }
         if (isset($event['description'])) {
             $data['description'] = $event['description'];
+        }
+        if (isset($event['location'])) {
+            $data['location'] = $event['location'];
         }
         if (isset($event['startDate'])) {
             $data['start_date'] = $event['startDate'];
