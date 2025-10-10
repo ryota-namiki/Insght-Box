@@ -223,12 +223,13 @@ try {
         if (!$tableExists) {
             echo '<p class="text-sm text-blue-600">🔧 eventsテーブルを作成中...</p>';
             
-            // eventsテーブルを作成
+            // eventsテーブルを作成（locationカラムも含む）
             $pdo->exec("
                 CREATE TABLE events (
                     id TEXT PRIMARY KEY NOT NULL,
                     name TEXT NOT NULL,
                     description TEXT,
+                    location TEXT,
                     start_date TEXT NOT NULL,
                     end_date TEXT NOT NULL,
                     created_at TEXT,
@@ -239,6 +240,22 @@ try {
             echo '<p class="text-sm text-green-600">✅ eventsテーブルを作成しました</p>';
         } else {
             echo '<p class="text-sm text-green-600">✅ eventsテーブルは既に存在します</p>';
+            
+            // locationカラムが存在するか確認
+            $columns = $pdo->query("PRAGMA table_info(events)")->fetchAll(PDO::FETCH_ASSOC);
+            $hasLocation = false;
+            foreach ($columns as $col) {
+                if ($col['name'] === 'location') {
+                    $hasLocation = true;
+                    break;
+                }
+            }
+            
+            if (!$hasLocation) {
+                echo '<p class="text-sm text-blue-600">🔧 locationカラムを追加中...</p>';
+                $pdo->exec("ALTER TABLE events ADD COLUMN location TEXT");
+                echo '<p class="text-sm text-green-600">✅ locationカラムを追加しました</p>';
+            }
         }
         
         // デフォルトイベントの確認と作成
@@ -249,14 +266,15 @@ try {
             $endDate = date('Y-m-d H:i:s', strtotime('+1 year'));
             
             $stmt = $pdo->prepare("
-                INSERT INTO events (id, name, description, start_date, end_date, created_at, updated_at)
-                VALUES (:id, :name, :description, :start_date, :end_date, :created_at, :updated_at)
+                INSERT INTO events (id, name, description, location, start_date, end_date, created_at, updated_at)
+                VALUES (:id, :name, :description, :location, :start_date, :end_date, :created_at, :updated_at)
             ");
             
             $stmt->execute([
                 ':id' => 'default-event',
                 ':name' => 'デフォルトイベント',
                 ':description' => 'システム作成',
+                ':location' => null,
                 ':start_date' => $now,
                 ':end_date' => $endDate,
                 ':created_at' => $now,
