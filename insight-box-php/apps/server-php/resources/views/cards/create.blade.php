@@ -399,7 +399,7 @@ function cardFormMain() {
                 formData.append('file', file);
                 formData.append('lang', 'jpn+eng');
                 
-                const response = await fetch('/api/v1/documents', {
+                const response = await fetch('{{ url("/api/v1/documents") }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -428,7 +428,7 @@ function cardFormMain() {
             // 簡易版：実際のジョブ監視は後で実装
             setTimeout(async () => {
                 try {
-                    const response = await fetch(`/api/v1/documents/${this.documentId}/text`);
+                    const response = await fetch(`{{ url("/api/v1/documents") }}/${this.documentId}/text`);
                     if (response.ok) {
                         const data = await response.json();
                         this.extractedText = data.text || 'テキスト抽出完了';
