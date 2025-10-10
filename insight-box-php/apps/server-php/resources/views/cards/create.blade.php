@@ -451,7 +451,7 @@ function cardFormMain() {
             
             this.isProcessing = true;
             try {
-                const response = await fetch('/api/webclip/fetch', {
+                const response = await fetch('{{ url("/api/webclip/fetch") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
