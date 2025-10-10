@@ -101,7 +101,8 @@ class DocumentController extends Controller
                 $jobs->updateProgress($jobId, 90);
             }
             
-            \Log::info("OCR処理完了: テキスト長={$text ? mb_strlen($text) : 0}");
+            $textLength = $text ? mb_strlen($text) : 0;
+            \Log::info("OCR処理完了: テキスト長={$textLength}");
             
             $docs->updateText($documentId, $text);
             $jobs->updateStatus($jobId, 'succeeded', 100);
