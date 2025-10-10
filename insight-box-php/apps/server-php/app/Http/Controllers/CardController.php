@@ -162,21 +162,17 @@ class CardController extends Controller
 
     // === Web用のメソッド ===
     
-    public function indexWeb(CardRepository $repo)
+    public function indexWeb(CardRepository $repo, \App\Repositories\EventRepository $eventRepo)
     {
         $cards = $repo->listSummaries();
-        $events = [
-            ['id' => 'dd35200f-c22f-460a-adaf-597acba70bdc', 'name' => 'デフォルトイベント'],
-        ];
+        $events = $eventRepo->list();
         
         return view('cards.index', compact('cards', 'events'));
     }
 
-    public function createWeb()
+    public function createWeb(\App\Repositories\EventRepository $eventRepo)
     {
-        $events = [
-            ['id' => 'dd35200f-c22f-460a-adaf-597acba70bdc', 'name' => 'デフォルトイベント'],
-        ];
+        $events = $eventRepo->list();
         
         return view('cards.create', compact('events'));
     }
@@ -247,7 +243,7 @@ class CardController extends Controller
         return view('cards.show', compact('card'));
     }
 
-    public function editWeb(string $id, CardRepository $repo)
+    public function editWeb(string $id, CardRepository $repo, \App\Repositories\EventRepository $eventRepo)
     {
         $card = $repo->find($id);
         
@@ -255,9 +251,7 @@ class CardController extends Controller
             abort(404, 'カードが見つかりません');
         }
         
-        $events = [
-            ['id' => 'dd35200f-c22f-460a-adaf-597acba70bdc', 'name' => 'デフォルトイベント'],
-        ];
+        $events = $eventRepo->list();
         
         return view('cards.edit', compact('card', 'events'));
     }
