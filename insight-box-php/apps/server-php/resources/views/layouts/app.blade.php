@@ -77,6 +77,41 @@
                         <span class="material-icons text-sm mr-1">add</span>
                         カード作成
                     </a>
+                    
+                    @auth
+                    <!-- ユーザーメニュー -->
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-sm mr-1">account_circle</span>
+                            {{ auth()->user()->name }}
+                            <span class="material-icons text-sm ml-1">arrow_drop_down</span>
+                        </button>
+                        
+                        <div x-show="open" @click.away="open = false" x-cloak
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
+                            <a href="{{ route('profile') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <span class="material-icons text-sm mr-2">person</span>
+                                プロフィール
+                            </a>
+                            <hr class="my-1">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <span class="material-icons text-sm mr-2">logout</span>
+                                    ログアウト
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    @else
+                    <!-- 未認証ユーザー -->
+                    <a href="{{ route('login') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                        ログイン
+                    </a>
+                    <a href="{{ route('register') }}" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">
+                        登録
+                    </a>
+                    @endauth
                 </div>
             </div>
         </div>

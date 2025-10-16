@@ -9,7 +9,7 @@ class CardRepository
     /** @return array<string,mixed> */
     public function read(): array
     {
-        $cards = Card::all();
+        $cards = Card::where('owner_user_id', auth()->id())->get();
         $result = [];
         
         foreach ($cards as $card) {
@@ -22,7 +22,9 @@ class CardRepository
     /** @return array<int,array<string,mixed>> */
     public function listSummaries(): array
     {
-        $cards = Card::orderBy('created_at', 'desc')->get();
+        $cards = Card::where('owner_user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
         
         return $cards->map(function ($card) {
             return [
@@ -56,6 +58,9 @@ class CardRepository
     {
         $data = [
             'id' => $id,
+            'owner_user_id' => $record['owner_user_id'] ?? auth()->id(),
+            'team_id' => $record['team_id'] ?? null,
+            'visibility' => $record['visibility'] ?? 'private',
             'title' => $record['summary']['title'] ?? '',
             'company' => $record['summary']['company'] ?? null,
             'tags' => $record['summary']['tags'] ?? [],

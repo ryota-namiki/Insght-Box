@@ -14,6 +14,9 @@ class Card extends Model
 
     protected $fillable = [
         'id',
+        'owner_user_id',
+        'team_id',
+        'visibility',
         'title',
         'company',
         'tags',
@@ -44,4 +47,28 @@ class Card extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * 所有者
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_user_id');
+    }
+
+    /**
+     * チーム（将来実装）
+     */
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    /**
+     * イベント
+     */
+    public function event()
+    {
+        return $this->belongsTo(\App\Models\Event::class, 'event_id');
+    }
 }

@@ -45,4 +45,30 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * ユーザープロフィール
+     */
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    /**
+     * 所有カード
+     */
+    public function cards()
+    {
+        return $this->hasMany(Card::class, 'owner_user_id');
+    }
+
+    /**
+     * 所属チーム（将来実装）
+     */
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'team_user')
+            ->withPivot('role', 'joined_at')
+            ->withTimestamps();
+    }
 }
