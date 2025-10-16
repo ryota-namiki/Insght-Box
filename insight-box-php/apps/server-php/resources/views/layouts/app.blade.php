@@ -83,7 +83,7 @@
     </nav>
     
     <!-- メインコンテンツ -->
-    <main class="mx-auto py-8" style="max-width: 75rem;">
+    <main class="mx-auto py-8" style="max-width: 75rem; height: 100vh;">
         @if(session('success'))
             <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded toast">
                 {{ session('success') }}
