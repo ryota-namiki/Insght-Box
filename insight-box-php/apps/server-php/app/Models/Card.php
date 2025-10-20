@@ -71,4 +71,28 @@ class Card extends Model
   {
     return $this->belongsTo(\App\Models\Event::class, 'event_id');
   }
+
+  /**
+   * お気に入り
+   */
+  public function favorites()
+  {
+    return $this->hasMany(Favorite::class, 'card_id', 'id');
+  }
+
+  /**
+   * 特定ユーザーがお気に入りしているか
+   */
+  public function isFavoritedBy(?int $userId = null): bool
+  {
+    if (!$userId) {
+      $userId = auth()->id();
+    }
+
+    if (!$userId) {
+      return false;
+    }
+
+    return $this->favorites()->where('user_id', $userId)->exists();
+  }
 }

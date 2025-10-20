@@ -69,14 +69,18 @@
             <span class="material-icons text-sm mr-1">dashboard</span>
             ボード
         </a>
-        <a href="{{ route('events.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('events.*') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
-            <span class="material-icons text-sm mr-1">event</span>
-            イベント
-        </a>
-        <a href="{{ route('cards.create') }}" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">
-            <span class="material-icons text-sm mr-1">add</span>
-            カード作成
-        </a>
+      <a href="{{ route('events.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('events.*') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
+        <span class="material-icons text-sm mr-1">event</span>
+        イベント
+      </a>
+      <a href="{{ route('favorites.index') }}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 {{ request()->routeIs('favorites.*') ? 'bg-gray-100 text-indigo-600' : 'text-gray-700' }}">
+        <span class="material-icons text-sm mr-1">favorite</span>
+        お気に入り
+      </a>
+      <a href="{{ route('cards.create') }}" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">
+        <span class="material-icons text-sm mr-1">add</span>
+        カード作成
+      </a>
         
         @auth
         <!-- ユーザーメニュー -->

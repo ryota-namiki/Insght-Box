@@ -44,7 +44,9 @@ class CardRepository
   /** @return array<string,mixed>|null */
   public function find(string $id): ?array
   {
-    $card = Card::find($id);
+    $card = Card::where('id', $id)
+      ->where('owner_user_id', auth()->id())
+      ->first();
 
     if (!$card) {
       return null;
@@ -86,7 +88,9 @@ class CardRepository
 
   public function delete(string $id): void
   {
-    Card::destroy($id);
+    Card::where('id', $id)
+      ->where('owner_user_id', auth()->id())
+      ->delete();
   }
 
   public function updatePosition(string $id, int $x, int $y): void

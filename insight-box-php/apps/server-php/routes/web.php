@@ -5,6 +5,7 @@ use App\Http\Controllers\CardController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FavoriteController;
 
 // ホームページ（カード一覧にリダイレクト）
 Route::get('/', function () {
@@ -28,6 +29,12 @@ Route::middleware('auth')->group(function () {
   // プロフィール
   Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile');
   Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+
+  // お気に入り
+  Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+  Route::post('/api/favorites', [FavoriteController::class, 'store'])->name('favorites.store');
+  Route::delete('/api/favorites/{cardId}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+  Route::post('/api/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });
 
 // === カード関連（認証必須） ===

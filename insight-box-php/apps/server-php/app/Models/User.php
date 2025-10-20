@@ -72,4 +72,21 @@ class User extends Authenticatable
       ->withPivot('role', 'joined_at')
       ->withTimestamps();
   }
+
+  /**
+   * お気に入り
+   */
+  public function favorites()
+  {
+    return $this->hasMany(Favorite::class);
+  }
+
+  /**
+   * お気に入りカード
+   */
+  public function favoriteCards()
+  {
+    return $this->belongsToMany(Card::class, 'favorites', 'user_id', 'card_id')
+      ->withTimestamps();
+  }
 }
