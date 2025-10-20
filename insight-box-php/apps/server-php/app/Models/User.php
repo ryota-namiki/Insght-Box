@@ -9,66 +9,67 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+  /** @use HasFactory<\Database\Factories\UserFactory> */
+  use HasFactory;
+  use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var list<string>
+   */
+  protected $fillable = [
+    'name',
+    'email',
+    'password',
+  ];
+
+  /**
+   * The attributes that should be hidden for serialization.
+   *
+   * @var list<string>
+   */
+  protected $hidden = [
+    'password',
+    'remember_token',
+  ];
+
+  /**
+   * Get the attributes that should be cast.
+   *
+   * @return array<string, string>
+   */
+  protected function casts(): array
+  {
+    return [
+      'email_verified_at' => 'datetime',
+      'password' => 'hashed',
     ];
+  }
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+  /**
+   * ユーザープロフィール
+   */
+  public function profile()
+  {
+    return $this->hasOne(UserProfile::class);
+  }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+  /**
+   * 所有カード
+   */
+  public function cards()
+  {
+    return $this->hasMany(Card::class, 'owner_user_id');
+  }
 
-    /**
-     * ユーザープロフィール
-     */
-    public function profile()
-    {
-        return $this->hasOne(UserProfile::class);
-    }
-
-    /**
-     * 所有カード
-     */
-    public function cards()
-    {
-        return $this->hasMany(Card::class, 'owner_user_id');
-    }
-
-    /**
-     * 所属チーム（将来実装）
-     */
-    public function teams()
-    {
-        return $this->belongsToMany(Team::class, 'team_user')
-            ->withPivot('role', 'joined_at')
-            ->withTimestamps();
-    }
+  /**
+   * 所属チーム（将来実装）
+   */
+  public function teams()
+  {
+    return $this->belongsToMany(Team::class, 'team_user')
+      ->withPivot('role', 'joined_at')
+      ->withTimestamps();
+  }
 }

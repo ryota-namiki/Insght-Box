@@ -1,12 +1,12 @@
 <?php
 /**
  * セットアップスクリプト
- * 
+ *
  * このファイルをブラウザで開いて、初期セットアップを実行できます
  * SSH不要でFileZillaだけでデプロイ完了！
- * 
+ *
  * アクセス: https://yourdomain.com/setup.php
- * 
+ *
  * セットアップ完了後は、このファイルを削除してください
  */
 
@@ -14,7 +14,7 @@
 $setupCompleteFile = __DIR__ . '/../storage/app/.setup_complete';
 
 if (file_exists($setupCompleteFile)) {
-    die('⚠️ セットアップは既に完了しています。このファイルを削除してください。');
+  die('⚠️ セットアップは既に完了しています。このファイルを削除してください。');
 }
 
 $errors = [];
@@ -46,61 +46,61 @@ $step = $_POST['step'] ?? 'check';
                     <?php
                     // PHP バージョンチェック
                     if (version_compare(PHP_VERSION, '8.1.0', '>=')) {
-                        $success[] = 'PHP ' . PHP_VERSION . ' ✅';
+                      $success[] = 'PHP ' . PHP_VERSION . ' ✅';
                     } else {
-                        $errors[] = 'PHP 8.1以上が必要です（現在: ' . PHP_VERSION . '）';
+                      $errors[] = 'PHP 8.1以上が必要です（現在: ' . PHP_VERSION . '）';
                     }
-                    
-                    // Composer autoloadチェック
-                    if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-                        $success[] = 'Composer依存関係がインストール済み ✅';
-                        require __DIR__ . '/../vendor/autoload.php';
-                    } else {
-                        $errors[] = 'vendor/ ディレクトリがありません。ローカルで composer install を実行して vendor/ もアップロードしてください。';
-                    }
-                    
-                    // .env ファイルチェック
-                    if (file_exists(__DIR__ . '/../.env')) {
-                        $success[] = '.env ファイルが存在します ✅';
-                    } else {
-                        $warnings[] = '.env ファイルがありません（これから作成します）';
-                    }
-                    
-                    // 書き込み権限チェック（自動修正試行）
-                    $storagePath = __DIR__ . '/../storage';
-                    $bootstrapCachePath = __DIR__ . '/../bootstrap/cache';
-                    
-                    // storage/ の権限チェックと修正
-                    if (!is_writable($storagePath)) {
-                        // パーミッション修正を試みる
-                        @chmod($storagePath, 0775);
-                        @chmod($storagePath . '/app', 0775);
-                        @chmod($storagePath . '/framework', 0775);
-                        @chmod($storagePath . '/logs', 0775);
-                        
-                        // 再チェック
-                        if (is_writable($storagePath)) {
-                            $success[] = 'storage/ ディレクトリのパーミッションを自動修正しました ✅';
-                        } else {
-                            $warnings[] = 'storage/ ディレクトリに書き込み権限がありません（手動で設定が必要）';
-                        }
-                    } else {
-                        $success[] = 'storage/ ディレクトリに書き込み権限あり ✅';
-                    }
-                    
-                    // bootstrap/cache/ の権限チェックと修正
-                    if (!is_writable($bootstrapCachePath)) {
-                        @chmod($bootstrapCachePath, 0775);
-                        
-                        if (is_writable($bootstrapCachePath)) {
-                            $success[] = 'bootstrap/cache/ ディレクトリのパーミッションを自動修正しました ✅';
-                        } else {
-                            $warnings[] = 'bootstrap/cache/ ディレクトリに書き込み権限がありません（手動で設定が必要）';
-                        }
-                    } else {
-                        $success[] = 'bootstrap/cache/ ディレクトリに書き込み権限あり ✅';
-                    }
-                    ?>
+
+// Composer autoloadチェック
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+  $success[] = 'Composer依存関係がインストール済み ✅';
+  require __DIR__ . '/../vendor/autoload.php';
+} else {
+  $errors[] = 'vendor/ ディレクトリがありません。ローカルで composer install を実行して vendor/ もアップロードしてください。';
+}
+
+// .env ファイルチェック
+if (file_exists(__DIR__ . '/../.env')) {
+  $success[] = '.env ファイルが存在します ✅';
+} else {
+  $warnings[] = '.env ファイルがありません（これから作成します）';
+}
+
+// 書き込み権限チェック（自動修正試行）
+$storagePath = __DIR__ . '/../storage';
+$bootstrapCachePath = __DIR__ . '/../bootstrap/cache';
+
+// storage/ の権限チェックと修正
+if (!is_writable($storagePath)) {
+  // パーミッション修正を試みる
+  @chmod($storagePath, 0775);
+  @chmod($storagePath . '/app', 0775);
+  @chmod($storagePath . '/framework', 0775);
+  @chmod($storagePath . '/logs', 0775);
+
+  // 再チェック
+  if (is_writable($storagePath)) {
+    $success[] = 'storage/ ディレクトリのパーミッションを自動修正しました ✅';
+  } else {
+    $warnings[] = 'storage/ ディレクトリに書き込み権限がありません（手動で設定が必要）';
+  }
+} else {
+  $success[] = 'storage/ ディレクトリに書き込み権限あり ✅';
+}
+
+// bootstrap/cache/ の権限チェックと修正
+if (!is_writable($bootstrapCachePath)) {
+  @chmod($bootstrapCachePath, 0775);
+
+  if (is_writable($bootstrapCachePath)) {
+    $success[] = 'bootstrap/cache/ ディレクトリのパーミッションを自動修正しました ✅';
+  } else {
+    $warnings[] = 'bootstrap/cache/ ディレクトリに書き込み権限がありません（手動で設定が必要）';
+  }
+} else {
+  $success[] = 'bootstrap/cache/ ディレクトリに書き込み権限あり ✅';
+}
+?>
                     
                     <?php if (!empty($success)): ?>
                         <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded">
@@ -227,164 +227,164 @@ $step = $_POST['step'] ?? 'check';
                 <!-- ステップ3: セットアップ実行 -->
                 <?php
                 require __DIR__ . '/../vendor/autoload.php';
-                
-                try {
-                    $appUrl = $_POST['app_url'] ?? 'http://localhost';
-                    $dbConnection = $_POST['db_connection'] ?? 'sqlite';
-                    $openaiKey = $_POST['openai_key'] ?? '';
-                    
-                    // プロジェクトルートのパーミッション設定
-                    $projectRoot = realpath(__DIR__ . '/..');
-                    @chmod($projectRoot, 0777);
-                    
-                    // パーミッション修正を試みる（777で最大権限）
-                    $dirs = [
-                        __DIR__ . '/../storage',
-                        __DIR__ . '/../storage/app',
-                        __DIR__ . '/../storage/app/public',
-                        __DIR__ . '/../storage/framework',
-                        __DIR__ . '/../storage/framework/cache',
-                        __DIR__ . '/../storage/framework/sessions',
-                        __DIR__ . '/../storage/framework/views',
-                        __DIR__ . '/../storage/logs',
-                        __DIR__ . '/../bootstrap/cache',
-                        __DIR__ . '/../database',
-                    ];
-                    
-                    foreach ($dirs as $dir) {
-                        if (file_exists($dir)) {
-                            @chmod($dir, 0777); // セットアップ時は最大権限
-                        } else {
-                            @mkdir($dir, 0777, true);
-                        }
-                    }
-                    $success[] = 'ディレクトリのパーミッションを設定しました（777）';
-                    
-                    // .env ファイルを作成
-                    $envContent = file_get_contents(__DIR__ . '/../.env.example');
-                    
-                    // APP_URL を設定
-                    $envContent = preg_replace('/^APP_URL=.*/m', "APP_URL={$appUrl}", $envContent);
-                    $envContent = preg_replace('/^APP_ENV=.*/m', 'APP_ENV=production', $envContent);
-                    $envContent = preg_replace('/^APP_DEBUG=.*/m', 'APP_DEBUG=false', $envContent);
-                    
-                    // アプリケーションキーを生成
-                    $appKey = 'base64:' . base64_encode(random_bytes(32));
-                    $envContent = preg_replace('/^APP_KEY=.*/m', "APP_KEY={$appKey}", $envContent);
-                    
-                    // データベース設定
-                    if ($dbConnection === 'sqlite') {
-                        $dbDir = __DIR__ . '/../database';
-                        
-                        // データベースディレクトリが存在することを確認
-                        if (!is_dir($dbDir)) {
-                            @mkdir($dbDir, 0775, true);
-                        }
-                        @chmod($dbDir, 0775);
-                        
-                        // 絶対パスを取得（realpath前にディレクトリ存在を確保）
-                        $dbDirReal = realpath($dbDir);
-                        if (!$dbDirReal) {
-                            throw new Exception("database/ ディレクトリが見つかりません");
-                        }
-                        
-                        $dbPath = $dbDirReal . '/database.sqlite';
-                        
-                        // データベースファイルを作成
-                        if (!file_exists($dbPath)) {
-                            if (file_put_contents($dbPath, '') === false) {
-                                throw new Exception("データベースファイルの作成に失敗しました。database/ ディレクトリのパーミッションを777に設定してください。");
-                            }
-                            @chmod($dbPath, 0666); // 全員が読み書き可能
-                        }
-                        
-                        $envContent = preg_replace('/^DB_CONNECTION=.*/m', 'DB_CONNECTION=sqlite', $envContent);
-                        $envContent = preg_replace('/^DB_DATABASE=.*/m', "DB_DATABASE={$dbPath}", $envContent);
-                        $success[] = "SQLiteデータベースパスを設定しました: {$dbPath}";
-                    } else {
-                        $dbDatabase = $_POST['db_database'] ?? '';
-                        $dbUsername = $_POST['db_username'] ?? '';
-                        $dbPassword = $_POST['db_password'] ?? '';
-                        $dbHost = $_POST['db_host'] ?? '127.0.0.1';
-                        
-                        $envContent = preg_replace('/^DB_CONNECTION=.*/m', "DB_CONNECTION={$dbConnection}", $envContent);
-                        $envContent = preg_replace('/^DB_DATABASE=.*/m', "DB_DATABASE={$dbDatabase}", $envContent);
-                        $envContent = preg_replace('/^DB_USERNAME=.*/m', "DB_USERNAME={$dbUsername}", $envContent);
-                        $envContent = preg_replace('/^DB_PASSWORD=.*/m', "DB_PASSWORD={$dbPassword}", $envContent);
-                        $envContent = preg_replace('/^DB_HOST=.*/m', "DB_HOST={$dbHost}", $envContent);
-                    }
-                    
-                    // OpenAI API Key
-                    if ($openaiKey) {
-                        if (strpos($envContent, 'OPENAI_API_KEY=') !== false) {
-                            $envContent = preg_replace('/^OPENAI_API_KEY=.*/m', "OPENAI_API_KEY={$openaiKey}", $envContent);
-                        } else {
-                            $envContent .= "\nOPENAI_API_KEY={$openaiKey}\n";
-                        }
-                    }
-                    
-                    // .env ファイルを保存
-                    $envPath = __DIR__ . '/../.env';
-                    $envCreated = @file_put_contents($envPath, $envContent);
-                    
-                    if ($envCreated === false) {
-                        // .envの作成に失敗した場合、内容を表示して手動作成を促す
-                        $warnings[] = '.env ファイルの自動作成に失敗しました。以下の内容を手動でコピーして .env ファイルを作成してください。';
-                        $showEnvContent = true;
-                    } else {
-                        @chmod($envPath, 0644);
-                        $success[] = '.env ファイルを作成しました';
-                        $showEnvContent = false;
-                    }
-                    
-                    // bootstrap/cache/ のパーミッション設定
-                    $bootstrapCacheDir = __DIR__ . '/../bootstrap/cache';
-                    @chmod($bootstrapCacheDir, 0777); // 一時的に全権限
-                    
-                    // 既存のキャッシュをクリア（重要！）
-                    $cacheDirs = [
-                        __DIR__ . '/../bootstrap/cache/config.php',
-                        __DIR__ . '/../bootstrap/cache/routes-v7.php',
-                        __DIR__ . '/../bootstrap/cache/services.php',
-                        __DIR__ . '/../bootstrap/cache/packages.php',
-                    ];
-                    foreach ($cacheDirs as $cacheFile) {
-                        if (file_exists($cacheFile)) {
-                            @unlink($cacheFile);
-                        }
-                    }
-                    
-                    // Artisan コマンドを実行
-                    $app = require_once __DIR__ . '/../bootstrap/app.php';
-                    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-                    
-                    // 設定をリロード
-                    $kernel->call('config:clear');
-                    
-                    // マイグレーション実行
-                    $kernel->call('migrate', ['--force' => true]);
-                    $success[] = 'データベースマイグレーションを実行しました';
-                    
-                    // キャッシュ最適化（エラーが出ても続行）
-                    try {
-                        $kernel->call('config:cache');
-                        $kernel->call('route:cache');
-                        $kernel->call('view:cache');
-                        $success[] = 'キャッシュを最適化しました';
-                    } catch (\Exception $e) {
-                        $warnings[] = 'キャッシュ最適化をスキップしました（パーミッション不足）。アプリケーションは動作します。';
-                    }
-                    
-                    // セットアップ完了フラグを作成
-                    @file_put_contents($setupCompleteFile, date('Y-m-d H:i:s'));
-                    
-                    $setupComplete = true;
-                    
-                } catch (Exception $e) {
-                    $errors[] = 'エラーが発生しました: ' . $e->getMessage();
-                    $setupComplete = false;
+
+              try {
+                $appUrl = $_POST['app_url'] ?? 'http://localhost';
+                $dbConnection = $_POST['db_connection'] ?? 'sqlite';
+                $openaiKey = $_POST['openai_key'] ?? '';
+
+                // プロジェクトルートのパーミッション設定
+                $projectRoot = realpath(__DIR__ . '/..');
+                @chmod($projectRoot, 0777);
+
+                // パーミッション修正を試みる（777で最大権限）
+                $dirs = [
+                  __DIR__ . '/../storage',
+                  __DIR__ . '/../storage/app',
+                  __DIR__ . '/../storage/app/public',
+                  __DIR__ . '/../storage/framework',
+                  __DIR__ . '/../storage/framework/cache',
+                  __DIR__ . '/../storage/framework/sessions',
+                  __DIR__ . '/../storage/framework/views',
+                  __DIR__ . '/../storage/logs',
+                  __DIR__ . '/../bootstrap/cache',
+                  __DIR__ . '/../database',
+                ];
+
+                foreach ($dirs as $dir) {
+                  if (file_exists($dir)) {
+                    @chmod($dir, 0777); // セットアップ時は最大権限
+                  } else {
+                    @mkdir($dir, 0777, true);
+                  }
                 }
-                ?>
+                $success[] = 'ディレクトリのパーミッションを設定しました（777）';
+
+                // .env ファイルを作成
+                $envContent = file_get_contents(__DIR__ . '/../.env.example');
+
+                // APP_URL を設定
+                $envContent = preg_replace('/^APP_URL=.*/m', "APP_URL={$appUrl}", $envContent);
+                $envContent = preg_replace('/^APP_ENV=.*/m', 'APP_ENV=production', $envContent);
+                $envContent = preg_replace('/^APP_DEBUG=.*/m', 'APP_DEBUG=false', $envContent);
+
+                // アプリケーションキーを生成
+                $appKey = 'base64:' . base64_encode(random_bytes(32));
+                $envContent = preg_replace('/^APP_KEY=.*/m', "APP_KEY={$appKey}", $envContent);
+
+                // データベース設定
+                if ($dbConnection === 'sqlite') {
+                  $dbDir = __DIR__ . '/../database';
+
+                  // データベースディレクトリが存在することを確認
+                  if (!is_dir($dbDir)) {
+                    @mkdir($dbDir, 0775, true);
+                  }
+                  @chmod($dbDir, 0775);
+
+                  // 絶対パスを取得（realpath前にディレクトリ存在を確保）
+                  $dbDirReal = realpath($dbDir);
+                  if (!$dbDirReal) {
+                    throw new Exception("database/ ディレクトリが見つかりません");
+                  }
+
+                  $dbPath = $dbDirReal . '/database.sqlite';
+
+                  // データベースファイルを作成
+                  if (!file_exists($dbPath)) {
+                    if (file_put_contents($dbPath, '') === false) {
+                      throw new Exception("データベースファイルの作成に失敗しました。database/ ディレクトリのパーミッションを777に設定してください。");
+                    }
+                    @chmod($dbPath, 0666); // 全員が読み書き可能
+                  }
+
+                  $envContent = preg_replace('/^DB_CONNECTION=.*/m', 'DB_CONNECTION=sqlite', $envContent);
+                  $envContent = preg_replace('/^DB_DATABASE=.*/m', "DB_DATABASE={$dbPath}", $envContent);
+                  $success[] = "SQLiteデータベースパスを設定しました: {$dbPath}";
+                } else {
+                  $dbDatabase = $_POST['db_database'] ?? '';
+                  $dbUsername = $_POST['db_username'] ?? '';
+                  $dbPassword = $_POST['db_password'] ?? '';
+                  $dbHost = $_POST['db_host'] ?? '127.0.0.1';
+
+                  $envContent = preg_replace('/^DB_CONNECTION=.*/m', "DB_CONNECTION={$dbConnection}", $envContent);
+                  $envContent = preg_replace('/^DB_DATABASE=.*/m', "DB_DATABASE={$dbDatabase}", $envContent);
+                  $envContent = preg_replace('/^DB_USERNAME=.*/m', "DB_USERNAME={$dbUsername}", $envContent);
+                  $envContent = preg_replace('/^DB_PASSWORD=.*/m', "DB_PASSWORD={$dbPassword}", $envContent);
+                  $envContent = preg_replace('/^DB_HOST=.*/m', "DB_HOST={$dbHost}", $envContent);
+                }
+
+                // OpenAI API Key
+                if ($openaiKey) {
+                  if (strpos($envContent, 'OPENAI_API_KEY=') !== false) {
+                    $envContent = preg_replace('/^OPENAI_API_KEY=.*/m', "OPENAI_API_KEY={$openaiKey}", $envContent);
+                  } else {
+                    $envContent .= "\nOPENAI_API_KEY={$openaiKey}\n";
+                  }
+                }
+
+                // .env ファイルを保存
+                $envPath = __DIR__ . '/../.env';
+                $envCreated = @file_put_contents($envPath, $envContent);
+
+                if ($envCreated === false) {
+                  // .envの作成に失敗した場合、内容を表示して手動作成を促す
+                  $warnings[] = '.env ファイルの自動作成に失敗しました。以下の内容を手動でコピーして .env ファイルを作成してください。';
+                  $showEnvContent = true;
+                } else {
+                  @chmod($envPath, 0644);
+                  $success[] = '.env ファイルを作成しました';
+                  $showEnvContent = false;
+                }
+
+                // bootstrap/cache/ のパーミッション設定
+                $bootstrapCacheDir = __DIR__ . '/../bootstrap/cache';
+                @chmod($bootstrapCacheDir, 0777); // 一時的に全権限
+
+                // 既存のキャッシュをクリア（重要！）
+                $cacheDirs = [
+                  __DIR__ . '/../bootstrap/cache/config.php',
+                  __DIR__ . '/../bootstrap/cache/routes-v7.php',
+                  __DIR__ . '/../bootstrap/cache/services.php',
+                  __DIR__ . '/../bootstrap/cache/packages.php',
+                ];
+                foreach ($cacheDirs as $cacheFile) {
+                  if (file_exists($cacheFile)) {
+                    @unlink($cacheFile);
+                  }
+                }
+
+                // Artisan コマンドを実行
+                $app = require_once __DIR__ . '/../bootstrap/app.php';
+                $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+
+                // 設定をリロード
+                $kernel->call('config:clear');
+
+                // マイグレーション実行
+                $kernel->call('migrate', ['--force' => true]);
+                $success[] = 'データベースマイグレーションを実行しました';
+
+                // キャッシュ最適化（エラーが出ても続行）
+                try {
+                  $kernel->call('config:cache');
+                  $kernel->call('route:cache');
+                  $kernel->call('view:cache');
+                  $success[] = 'キャッシュを最適化しました';
+                } catch (\Exception $e) {
+                  $warnings[] = 'キャッシュ最適化をスキップしました（パーミッション不足）。アプリケーションは動作します。';
+                }
+
+                // セットアップ完了フラグを作成
+                @file_put_contents($setupCompleteFile, date('Y-m-d H:i:s'));
+
+                $setupComplete = true;
+
+              } catch (Exception $e) {
+                $errors[] = 'エラーが発生しました: ' . $e->getMessage();
+                $setupComplete = false;
+              }
+?>
                 
                 <?php if (!empty($success)): ?>
                     <div class="mb-6 p-6 bg-green-50 border border-green-200 rounded-lg">

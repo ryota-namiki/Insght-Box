@@ -2,9 +2,9 @@
 /**
  * デバッグスクリプト
  * エラーの詳細を確認するためのツール
- * 
+ *
  * アクセス: https://yourdomain.com/debug.php
- * 
+ *
  * 確認後は必ず削除してください
  */
 
@@ -35,25 +35,25 @@
                     <div class="space-y-1 text-sm font-mono">
                         <?php
                         $checks = [
-                            '.env' => __DIR__ . '/../.env',
-                            'vendor/' => __DIR__ . '/../vendor',
-                            'bootstrap/app.php' => __DIR__ . '/../bootstrap/app.php',
-                            'storage/' => __DIR__ . '/../storage',
-                            'database.sqlite' => __DIR__ . '/../database/database.sqlite',
+                          '.env' => __DIR__ . '/../.env',
+                          'vendor/' => __DIR__ . '/../vendor',
+                          'bootstrap/app.php' => __DIR__ . '/../bootstrap/app.php',
+                          'storage/' => __DIR__ . '/../storage',
+                          'database.sqlite' => __DIR__ . '/../database/database.sqlite',
                         ];
-                        
-                        foreach ($checks as $name => $path) {
-                            $exists = file_exists($path);
-                            $writable = is_writable($path);
-                            echo '<p>';
-                            echo $exists ? '✅' : '❌';
-                            echo ' ' . htmlspecialchars($name);
-                            if ($exists && is_dir($path)) {
-                                echo $writable ? ' (書込可)' : ' (書込不可)';
-                            }
-                            echo '</p>';
-                        }
-                        ?>
+
+foreach ($checks as $name => $path) {
+  $exists = file_exists($path);
+  $writable = is_writable($path);
+  echo '<p>';
+  echo $exists ? '✅' : '❌';
+  echo ' ' . htmlspecialchars($name);
+  if ($exists && is_dir($path)) {
+    echo $writable ? ' (書込可)' : ' (書込不可)';
+  }
+  echo '</p>';
+}
+?>
                     </div>
                 </div>
                 
@@ -63,11 +63,11 @@
                     <h2 class="font-semibold mb-3">.env ファイル（機密情報は隠します）</h2>
                     <div class="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs overflow-x-auto">
                         <pre><?php
-                        $envContent = file_get_contents(__DIR__ . '/../.env');
-                        // パスワードやキーを隠す
-                        $envContent = preg_replace('/(PASSWORD|KEY|SECRET)=.*/i', '$1=***HIDDEN***', $envContent);
-                        echo htmlspecialchars($envContent);
-                        ?></pre>
+$envContent = file_get_contents(__DIR__ . '/../.env');
+                  // パスワードやキーを隠す
+                  $envContent = preg_replace('/(PASSWORD|KEY|SECRET)=.*/i', '$1=***HIDDEN***', $envContent);
+                  echo htmlspecialchars($envContent);
+                  ?></pre>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -75,16 +75,16 @@
                 <!-- エラーログ確認 -->
                 <?php
                 $logFile = __DIR__ . '/../storage/logs/laravel.log';
-                if (file_exists($logFile) && is_readable($logFile)):
-                ?>
+if (file_exists($logFile) && is_readable($logFile)):
+  ?>
                 <div class="bg-red-50 p-4 rounded">
                     <h2 class="font-semibold mb-3">最新のエラーログ（最後の50行）</h2>
                     <div class="bg-gray-900 text-red-400 p-3 rounded font-mono text-xs overflow-x-auto max-h-96 overflow-y-auto">
                         <pre><?php
-                        $lines = file($logFile);
-                        $lastLines = array_slice($lines, -50);
-                        echo htmlspecialchars(implode('', $lastLines));
-                        ?></pre>
+          $lines = file($logFile);
+  $lastLines = array_slice($lines, -50);
+  echo htmlspecialchars(implode('', $lastLines));
+  ?></pre>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -94,58 +94,58 @@
                     <h2 class="font-semibold mb-3">Laravel 起動テスト</h2>
                     <?php
                     try {
-                        require __DIR__ . '/../vendor/autoload.php';
-                        $app = require_once __DIR__ . '/../bootstrap/app.php';
-                        echo '<p class="text-green-700">✅ Laravel が正常に起動します</p>';
-                        
-                        // データベース接続テスト
-                        try {
-                            $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-                            $kernel->bootstrap();
-                            
-                            $db = $app->make('db');
-                            $db->connection()->getPdo();
-                            echo '<p class="text-green-700">✅ データベース接続成功</p>';
-                            
-                            // カード数確認
-                            $cardCount = $db->table('cards')->count();
-                            echo '<p class="text-green-700">✅ カード数: ' . $cardCount . '件</p>';
-                            
-                        } catch (Exception $e) {
-                            echo '<p class="text-red-700">❌ データベースエラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
-                        }
-                        
+                      require __DIR__ . '/../vendor/autoload.php';
+                      $app = require_once __DIR__ . '/../bootstrap/app.php';
+                      echo '<p class="text-green-700">✅ Laravel が正常に起動します</p>';
+
+                      // データベース接続テスト
+                      try {
+                        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+                        $kernel->bootstrap();
+
+                        $db = $app->make('db');
+                        $db->connection()->getPdo();
+                        echo '<p class="text-green-700">✅ データベース接続成功</p>';
+
+                        // カード数確認
+                        $cardCount = $db->table('cards')->count();
+                        echo '<p class="text-green-700">✅ カード数: ' . $cardCount . '件</p>';
+
+                      } catch (Exception $e) {
+                        echo '<p class="text-red-700">❌ データベースエラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
+                      }
+
                     } catch (Exception $e) {
-                        echo '<p class="text-red-700">❌ Laravel起動エラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
+                      echo '<p class="text-red-700">❌ Laravel起動エラー: ' . htmlspecialchars($e->getMessage()) . '</p>';
                     }
-                    ?>
+?>
                 </div>
                 
                 <!-- 最新のLaravelログ -->
                 <div class="bg-yellow-50 p-4 rounded">
                     <h2 class="font-semibold mb-3">📋 最新のログ（最後の100行）</h2>
                     <?php
-                    $logPath = __DIR__ . '/../storage/logs/laravel.log';
-                    if (file_exists($logPath)) {
-                        $lines = file($logPath);
-                        $lastLines = array_slice($lines, -100);
-                        echo '<pre class="text-xs bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto max-h-96 overflow-y-auto">';
-                        foreach ($lastLines as $line) {
-                            if (strpos($line, 'ERROR') !== false) {
-                                echo '<span class="text-red-400">' . htmlspecialchars($line) . '</span>';
-                            } elseif (strpos($line, 'WARNING') !== false) {
-                                echo '<span class="text-yellow-400">' . htmlspecialchars($line) . '</span>';
-                            } elseif (strpos($line, 'INFO') !== false) {
-                                echo '<span class="text-blue-400">' . htmlspecialchars($line) . '</span>';
-                            } else {
-                                echo htmlspecialchars($line);
-                            }
-                        }
-                        echo '</pre>';
-                    } else {
-                        echo '<p class="text-gray-600">ログファイルが見つかりません</p>';
-                    }
-                    ?>
+$logPath = __DIR__ . '/../storage/logs/laravel.log';
+if (file_exists($logPath)) {
+  $lines = file($logPath);
+  $lastLines = array_slice($lines, -100);
+  echo '<pre class="text-xs bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto max-h-96 overflow-y-auto">';
+  foreach ($lastLines as $line) {
+    if (strpos($line, 'ERROR') !== false) {
+      echo '<span class="text-red-400">' . htmlspecialchars($line) . '</span>';
+    } elseif (strpos($line, 'WARNING') !== false) {
+      echo '<span class="text-yellow-400">' . htmlspecialchars($line) . '</span>';
+    } elseif (strpos($line, 'INFO') !== false) {
+      echo '<span class="text-blue-400">' . htmlspecialchars($line) . '</span>';
+    } else {
+      echo htmlspecialchars($line);
+    }
+  }
+  echo '</pre>';
+} else {
+  echo '<p class="text-gray-600">ログファイルが見つかりません</p>';
+}
+?>
                 </div>
                 
                 <!-- 推奨アクション -->

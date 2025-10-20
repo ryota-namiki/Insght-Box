@@ -7,24 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserProfile extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'department',
-        'avatar_url',
-        'interests',
-    ];
+  protected $fillable = [
+    'user_id',
+    'department',
+    'avatar_url',
+    'interests',
+  ];
 
-    protected $casts = [
-        'interests' => 'array',
-    ];
+  protected $casts = [
+    'interests' => 'array',
+  ];
 
-    /**
-     * ユーザー
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+  /**
+   * ユーザー
+   */
+  public function user()
+  {
+    return $this->belongsTo(User::class);
+  }
 }

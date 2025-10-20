@@ -1,4 +1,5 @@
 <?php
+
 /**
  * エラー詳細表示スクリプト
  * デバッグモードを強制的にONにしてエラーを表示
@@ -22,46 +23,46 @@ echo '<!DOCTYPE html>
         <div class="space-y-4">';
 
 try {
-    // .envを一時的にデバッグモードに変更
-    putenv('APP_ENV=local');
-    putenv('APP_DEBUG=true');
-    
-    require __DIR__ . '/../vendor/autoload.php';
-    
-    echo '<p class="text-green-700">✅ autoload成功</p>';
-    
-    $app = require_once __DIR__ . '/../bootstrap/app.php';
-    
-    echo '<p class="text-green-700">✅ app起動成功</p>';
-    
-    // リクエストをシミュレート
-    $request = Illuminate\Http\Request::create('/cards', 'GET');
-    
-    echo '<p class="text-blue-700">🔄 /cards にアクセスを試みます...</p>';
-    
-    // レスポンスを取得
-    $response = $app->handle($request);
-    
-    echo '<p class="text-green-700">✅ レスポンス取得成功</p>';
-    echo '<p class="text-gray-700">ステータスコード: ' . $response->getStatusCode() . '</p>';
-    
-    if ($response->getStatusCode() === 200) {
-        echo '<div class="mt-6 p-4 bg-green-50 border border-green-200 rounded">
+  // .envを一時的にデバッグモードに変更
+  putenv('APP_ENV=local');
+  putenv('APP_DEBUG=true');
+
+  require __DIR__ . '/../vendor/autoload.php';
+
+  echo '<p class="text-green-700">✅ autoload成功</p>';
+
+  $app = require_once __DIR__ . '/../bootstrap/app.php';
+
+  echo '<p class="text-green-700">✅ app起動成功</p>';
+
+  // リクエストをシミュレート
+  $request = Illuminate\Http\Request::create('/cards', 'GET');
+
+  echo '<p class="text-blue-700">🔄 /cards にアクセスを試みます...</p>';
+
+  // レスポンスを取得
+  $response = $app->handle($request);
+
+  echo '<p class="text-green-700">✅ レスポンス取得成功</p>';
+  echo '<p class="text-gray-700">ステータスコード: ' . $response->getStatusCode() . '</p>';
+
+  if ($response->getStatusCode() === 200) {
+    echo '<div class="mt-6 p-4 bg-green-50 border border-green-200 rounded">
                 <p class="text-green-900 font-semibold">🎉 正常に動作しています！</p>
                 <p class="text-green-800 text-sm mt-2">エラーは別の原因かもしれません。</p>
                 <a href="/cards" class="mt-4 inline-block px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                     カード一覧を開く
                 </a>
             </div>';
-    } else {
-        echo '<div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
+  } else {
+    echo '<div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
                 <p class="text-yellow-900">ステータス: ' . $response->getStatusCode() . '</p>
                 <pre class="mt-2 text-xs bg-gray-900 text-yellow-400 p-3 rounded overflow-x-auto">' . htmlspecialchars($response->getContent()) . '</pre>
             </div>';
-    }
-    
+  }
+
 } catch (Exception $e) {
-    echo '<div class="mt-6 p-4 bg-red-50 border border-red-200 rounded">
+  echo '<div class="mt-6 p-4 bg-red-50 border border-red-200 rounded">
             <h2 class="text-red-900 font-semibold mb-2">❌ エラー発生</h2>
             <p class="text-red-800 mb-3">' . htmlspecialchars($e->getMessage()) . '</p>
             <div class="bg-gray-900 text-red-400 p-3 rounded text-xs overflow-x-auto">
@@ -71,7 +72,7 @@ try {
             </div>
         </div>';
 } catch (Throwable $e) {
-    echo '<div class="mt-6 p-4 bg-red-50 border border-red-200 rounded">
+  echo '<div class="mt-6 p-4 bg-red-50 border border-red-200 rounded">
             <h2 class="text-red-900 font-semibold mb-2">❌ 致命的エラー</h2>
             <p class="text-red-800 mb-3">' . htmlspecialchars($e->getMessage()) . '</p>
             <div class="bg-gray-900 text-red-400 p-3 rounded text-xs overflow-x-auto">
@@ -86,4 +87,3 @@ echo '    </div>
     </div>
 </body>
 </html>';
-

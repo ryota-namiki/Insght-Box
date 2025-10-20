@@ -1,4 +1,5 @@
 <?php
+
 /**
  * デバッグモード有効化スクリプト
  * エラーの詳細を表示できるようにします
@@ -7,7 +8,7 @@
 $envPath = __DIR__ . '/../.env';
 
 if (!file_exists($envPath)) {
-    die('❌ .env ファイルが見つかりません');
+  die('❌ .env ファイルが見つかりません');
 }
 
 $envContent = file_get_contents($envPath);
@@ -22,14 +23,14 @@ file_put_contents($envPath, $envContent);
 
 // キャッシュクリア
 $cacheFiles = [
-    __DIR__ . '/../bootstrap/cache/config.php',
-    __DIR__ . '/../bootstrap/cache/routes-v7.php',
+  __DIR__ . '/../bootstrap/cache/config.php',
+  __DIR__ . '/../bootstrap/cache/routes-v7.php',
 ];
 
 foreach ($cacheFiles as $file) {
-    if (file_exists($file)) {
-        @unlink($file);
-    }
+  if (file_exists($file)) {
+    @unlink($file);
+  }
 }
 
 echo '<!DOCTYPE html>
@@ -63,4 +64,3 @@ echo '<!DOCTYPE html>
     </div>
 </body>
 </html>';
-

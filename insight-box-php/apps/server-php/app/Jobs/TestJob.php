@@ -7,21 +7,21 @@ use Illuminate\Foundation\Queue\Queueable;
 
 class TestJob implements ShouldQueue
 {
-    use Queueable;
+  use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+  /**
+   * Create a new job instance.
+   */
+  public function __construct()
+  {
+    //
+  }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
-    {
-        \Log::info('Test job executed');
-    }
+  /**
+   * Execute the job.
+   */
+  public function handle(): void
+  {
+    \Log::info('Test job executed');
+  }
 }
