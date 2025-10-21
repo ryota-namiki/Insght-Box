@@ -9,8 +9,10 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50">
-  @yield('content')
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <div class="flex-1 flex items-center justify-center">
+    @yield('content')
+  </div>
 </body>
 </html>
 

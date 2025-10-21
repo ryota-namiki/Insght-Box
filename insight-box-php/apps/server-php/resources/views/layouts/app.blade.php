@@ -49,9 +49,9 @@
   
   @yield('styles')
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 min-h-screen flex flex-col">
   <!-- ナビゲーションバー -->
-  <nav class="bg-white shadow-md">
+  <nav class="bg-white shadow-md flex-shrink-0">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
@@ -122,7 +122,7 @@
   </nav>
   
   <!-- メインコンテンツ -->
-  <main class="mx-auto py-8" style="max-width: 75rem;">
+  <main class="flex-1 mx-auto py-8" style="max-width: 75rem;">
       @if(session('success'))
       <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded toast">
           {{ session('success') }}
@@ -139,7 +139,7 @@
   </main>
   
   <!-- フッター -->
-  <footer class="bg-white border-t mt-12">
+  <footer class="bg-white border-t mt-auto flex-shrink-0">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <p class="text-center text-gray-500 text-sm">
           © 2025 Insight-Box. All rights reserved.
