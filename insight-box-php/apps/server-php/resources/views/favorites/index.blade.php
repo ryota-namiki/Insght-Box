@@ -15,7 +15,7 @@
         data-favorited="true"
         title="お気に入りから削除"
       >
-        <span class="material-icons text-2xl text-yellow-500">star</span>
+        <span class="material-icons text-2xl text-red-500">favorite</span>
       </button>
 
       <a href="{{ route('cards.show', $card['id']) }}" class="block p-6 pt-12">

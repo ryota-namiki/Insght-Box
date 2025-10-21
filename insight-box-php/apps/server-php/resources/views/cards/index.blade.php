@@ -65,8 +65,8 @@
         data-favorited="{{ $card['isFavorited'] ? 'true' : 'false' }}"
         title="{{ $card['isFavorited'] ? 'お気に入りから削除' : 'お気に入りに追加' }}"
           >
-        <span class="material-icons text-2xl {{ $card['isFavorited'] ? 'text-yellow-500' : 'text-gray-300' }}">
-            {{ $card['isFavorited'] ? 'star' : 'star_border' }}
+        <span class="material-icons text-2xl {{ $card['isFavorited'] ? 'text-red-500' : 'text-gray-300' }}">
+            {{ $card['isFavorited'] ? 'favorite' : 'favorite_border' }}
         </span>
           </button>
 
@@ -134,8 +134,8 @@ async function toggleFavorite(cardId, button) {
     const isFavorited = data.isFavorited;
 
     // アイコンと色を更新
-    icon.textContent = isFavorited ? 'star' : 'star_border';
-    icon.className = `material-icons text-2xl ${isFavorited ? 'text-yellow-500' : 'text-gray-300'}`;
+    icon.textContent = isFavorited ? 'favorite' : 'favorite_border';
+    icon.className = `material-icons text-2xl ${isFavorited ? 'text-red-500' : 'text-gray-300'}`;
     button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
     button.setAttribute('title', isFavorited ? 'お気に入りから削除' : 'お気に入りに追加');
 

@@ -15,12 +15,12 @@
       <button 
           id="favorite-btn"
           onclick="toggleFavorite('{{ $card['id'] }}')" 
-          class="flex items-center px-4 py-2 {{ $isFavorited ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-200 hover:bg-gray-300' }} text-white rounded-md transition-colors"
+          class="flex items-center px-4 py-2 {{ $isFavorited ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-200 hover:bg-gray-300' }} text-white rounded-md transition-colors"
           data-favorited="{{ $isFavorited ? 'true' : 'false' }}"
           title="{{ $isFavorited ? 'お気に入りから削除' : 'お気に入りに追加' }}"
       >
           <span class="material-icons text-sm mr-1" id="favorite-icon">
-        {{ $isFavorited ? 'star' : 'star_border' }}
+        {{ $isFavorited ? 'favorite' : 'favorite_border' }}
           </span>
           <span id="favorite-text">{{ $isFavorited ? 'お気に入り済み' : 'お気に入り' }}</span>
       </button>
@@ -222,13 +222,13 @@ async function toggleFavorite(cardId) {
 
     // ボタンのスタイルを更新
     if (isFavorited) {
-      button.className = 'flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition-colors';
-      icon.textContent = 'star';
+      button.className = 'flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors';
+      icon.textContent = 'favorite';
       text.textContent = 'お気に入り済み';
       button.setAttribute('title', 'お気に入りから削除');
     } else {
       button.className = 'flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-white rounded-md transition-colors';
-      icon.textContent = 'star_border';
+      icon.textContent = 'favorite_border';
       text.textContent = 'お気に入り';
       button.setAttribute('title', 'お気に入りに追加');
     }
