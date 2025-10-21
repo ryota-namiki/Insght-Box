@@ -6,6 +6,9 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'Insight-Box')</title>
   
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
