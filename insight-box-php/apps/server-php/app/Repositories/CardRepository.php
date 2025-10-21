@@ -9,7 +9,7 @@ class CardRepository
   /** @return array<string,mixed> */
   public function read(): array
   {
-    $cards = Card::where('owner_user_id', auth()->id())->get();
+    $cards = Card::all();
     $result = [];
 
     foreach ($cards as $card) {
@@ -22,8 +22,7 @@ class CardRepository
   /** @return array<int,array<string,mixed>> */
   public function listSummaries(): array
   {
-    $cards = Card::where('owner_user_id', auth()->id())
-      ->orderBy('created_at', 'desc')
+    $cards = Card::orderBy('created_at', 'desc')
       ->get();
 
     return $cards->map(function ($card) {
@@ -44,9 +43,7 @@ class CardRepository
   /** @return array<string,mixed>|null */
   public function find(string $id): ?array
   {
-    $card = Card::where('id', $id)
-      ->where('owner_user_id', auth()->id())
-      ->first();
+    $card = Card::where('id', $id)->first();
 
     if (!$card) {
       return null;
@@ -88,9 +85,7 @@ class CardRepository
 
   public function delete(string $id): void
   {
-    Card::where('id', $id)
-      ->where('owner_user_id', auth()->id())
-      ->delete();
+    Card::where('id', $id)->delete();
   }
 
   public function updatePosition(string $id, int $x, int $y): void
