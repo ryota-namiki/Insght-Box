@@ -71,14 +71,9 @@
           </button>
 
           <a href="{{ route('cards.show', $card['id']) }}" class="block p-6 pt-12">
-        <div class="flex items-start justify-between mb-3">
-            <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
-        {{ $card['title'] }}
-            </h3>
-            <span class="ml-2 px-2 py-1 text-xs rounded-full {{ $card['status'] === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-        {{ $card['status'] === 'published' ? '公開' : '下書き' }}
-            </span>
-        </div>
+        <h3 class="text-lg font-semibold text-gray-900 line-clamp-2 mb-3">
+          {{ $card['title'] }}
+        </h3>
         
         @if($card['company'])
             <p class="text-sm text-gray-600 mb-3">

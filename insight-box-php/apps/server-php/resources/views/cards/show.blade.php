@@ -47,14 +47,9 @@
   <div class="bg-white rounded-lg shadow-lg">
       <!-- ヘッダー部分 -->
       <div class="px-8 py-6 border-b border-gray-200">
-      <div class="flex items-start justify-between gap-4 mb-4">
-          <h1 class="text-3xl font-bold text-gray-900 flex-1">
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">
         {{ $card['summary']['title'] }}
-          </h1>
-          <span class="px-3 py-1 text-sm rounded-full whitespace-nowrap {{ $card['summary']['status'] === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-        {{ $card['summary']['status'] === 'published' ? '公開' : '下書き' }}
-          </span>
-      </div>
+      </h1>
       
       @if($card['summary']['company'])
           <p class="text-lg text-gray-700 mb-4 flex items-center">
