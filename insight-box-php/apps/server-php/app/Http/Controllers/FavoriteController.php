@@ -15,7 +15,6 @@ class FavoriteController extends Controller
   {
     $user = auth()->user();
     $favoriteCards = $user->favoriteCards()
-      ->with('event')
       ->orderBy('favorites.created_at', 'desc')
       ->get();
 
@@ -31,6 +30,7 @@ class FavoriteController extends Controller
         'createdAt' => $card->created_at->toIso8601String(),
         'updatedAt' => $card->updated_at->toIso8601String(),
         'favoritedAt' => $card->pivot->created_at->toIso8601String(),
+        'isFavorited' => true, // お気に入りページでは常にtrue
       ];
     })->toArray();
 
@@ -113,7 +113,7 @@ class FavoriteController extends Controller
       $favorite->delete();
       return response()->json([
         'success' => true,
-        'favorited' => false,
+        'isFavorited' => false,
         'message' => 'お気に入りから削除しました',
       ]);
     } else {
@@ -124,7 +124,7 @@ class FavoriteController extends Controller
       ]);
       return response()->json([
         'success' => true,
-        'favorited' => true,
+        'isFavorited' => true,
         'message' => 'お気に入りに追加しました',
       ]);
     }
