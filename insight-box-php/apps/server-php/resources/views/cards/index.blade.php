@@ -57,8 +57,20 @@
 @else
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @foreach($cards as $card)
-      <a href="{{ route('cards.show', $card['id']) }}" class="card bg-white rounded-lg shadow-md hover:shadow-xl overflow-hidden">
-          <div class="p-6">
+      <div class="relative card bg-white rounded-lg shadow-md hover:shadow-xl overflow-hidden">
+          <!-- お気に入りボタン -->
+          <button 
+        onclick="event.preventDefault(); toggleFavorite('{{ $card['id'] }}', this)" 
+        class="absolute top-3 right-3 z-10 p-2 rounded-full hover:bg-gray-100 transition-colors"
+        data-favorited="{{ $card['isFavorited'] ? 'true' : 'false' }}"
+        title="{{ $card['isFavorited'] ? 'お気に入りから削除' : 'お気に入りに追加' }}"
+          >
+        <span class="material-icons text-2xl {{ $card['isFavorited'] ? 'text-yellow-500' : 'text-gray-300' }}">
+            {{ $card['isFavorited'] ? 'star' : 'star_border' }}
+        </span>
+          </button>
+
+          <a href="{{ route('cards.show', $card['id']) }}" class="block p-6 pt-12">
         <div class="flex items-start justify-between mb-3">
             <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
         {{ $card['title'] }}
@@ -96,10 +108,46 @@
         {{ \Carbon\Carbon::parse($card['createdAt'])->format('Y/m/d') }}
             </span>
         </div>
-          </div>
-      </a>
+          </a>
+      </div>
       @endforeach
   </div>
 @endif
+
+@section('scripts')
+<script>
+// CSRFトークン
+const csrfToken = '{{ csrf_token() }}';
+
+// お気に入りトグル
+async function toggleFavorite(cardId, button) {
+  try {
+    const response = await fetch('{{ route("favorites.toggle") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify({ card_id: cardId })
+    });
+
+    if (!response.ok) throw new Error('Failed to toggle favorite');
+
+    const data = await response.json();
+    const icon = button.querySelector('.material-icons');
+    const isFavorited = data.isFavorited;
+
+    // アイコンと色を更新
+    icon.textContent = isFavorited ? 'star' : 'star_border';
+    icon.className = `material-icons text-2xl ${isFavorited ? 'text-yellow-500' : 'text-gray-300'}`;
+    button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
+    button.setAttribute('title', isFavorited ? 'お気に入りから削除' : 'お気に入りに追加');
+
+  } catch (error) {
+    console.error('お気に入り操作エラー:', error);
+    alert('お気に入り操作に失敗しました');
+  }
+}
+</script>
 @endsection
 

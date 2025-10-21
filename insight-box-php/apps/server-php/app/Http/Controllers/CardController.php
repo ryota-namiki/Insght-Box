@@ -174,6 +174,13 @@ class CardController extends Controller
     $cards = $repo->listSummaries();
     $events = $eventRepo->list();
 
+    // 各カードのお気に入り状態を追加
+    $userId = auth()->id();
+    foreach ($cards as &$card) {
+      $cardModel = \App\Models\Card::find($card['id']);
+      $card['isFavorited'] = $cardModel ? $cardModel->isFavoritedBy($userId) : false;
+    }
+
     return view('cards.index', compact('cards', 'events'));
   }
 
@@ -247,7 +254,11 @@ class CardController extends Controller
       abort(404, 'カードが見つかりません');
     }
 
-    return view('cards.show', compact('card'));
+    // お気に入り状態を追加
+    $cardModel = \App\Models\Card::find($id);
+    $isFavorited = $cardModel ? $cardModel->isFavoritedBy(auth()->id()) : false;
+
+    return view('cards.show', compact('card', 'isFavorited'));
   }
 
   public function editWeb(string $id, CardRepository $repo, \App\Repositories\EventRepository $eventRepo)

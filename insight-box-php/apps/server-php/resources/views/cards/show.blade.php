@@ -11,6 +11,20 @@
       一覧に戻る
       </a>
       <div class="flex items-center space-x-2">
+      <!-- お気に入りボタン -->
+      <button 
+          id="favorite-btn"
+          onclick="toggleFavorite('{{ $card['id'] }}')" 
+          class="flex items-center px-4 py-2 {{ $isFavorited ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-200 hover:bg-gray-300' }} text-white rounded-md transition-colors"
+          data-favorited="{{ $isFavorited ? 'true' : 'false' }}"
+          title="{{ $isFavorited ? 'お気に入りから削除' : 'お気に入りに追加' }}"
+      >
+          <span class="material-icons text-sm mr-1" id="favorite-icon">
+        {{ $isFavorited ? 'star' : 'star_border' }}
+          </span>
+          <span id="favorite-text">{{ $isFavorited ? 'お気に入り済み' : 'お気に入り' }}</span>
+      </button>
+
       <a href="{{ route('cards.edit', $card['id']) }}" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
           <span class="material-icons text-sm mr-1">edit</span>
           編集
@@ -188,6 +202,49 @@
 
 @section('scripts')
 <script>
+// CSRFトークン
+const csrfToken = '{{ csrf_token() }}';
+
+// お気に入りトグル
+async function toggleFavorite(cardId) {
+  try {
+    const response = await fetch('{{ route("favorites.toggle") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify({ card_id: cardId })
+    });
+
+    if (!response.ok) throw new Error('Failed to toggle favorite');
+
+    const data = await response.json();
+    const button = document.getElementById('favorite-btn');
+    const icon = document.getElementById('favorite-icon');
+    const text = document.getElementById('favorite-text');
+    const isFavorited = data.isFavorited;
+
+    // ボタンのスタイルを更新
+    if (isFavorited) {
+      button.className = 'flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition-colors';
+      icon.textContent = 'star';
+      text.textContent = 'お気に入り済み';
+      button.setAttribute('title', 'お気に入りから削除');
+    } else {
+      button.className = 'flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-white rounded-md transition-colors';
+      icon.textContent = 'star_border';
+      text.textContent = 'お気に入り';
+      button.setAttribute('title', 'お気に入りに追加');
+    }
+    button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
+
+  } catch (error) {
+    console.error('お気に入り操作エラー:', error);
+    alert('お気に入り操作に失敗しました');
+  }
+}
+
 // 画像の高さに合わせてテキストエリアの高さを調整
 function adjustTextHeight() {
   const previewImage = document.getElementById('preview-image');
