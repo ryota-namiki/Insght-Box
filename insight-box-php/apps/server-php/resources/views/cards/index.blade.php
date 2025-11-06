@@ -46,28 +46,26 @@
 <!-- カードグリッド -->
 @if(empty($cards))
   <div class="bg-white rounded-lg shadow p-12 text-center">
-      <span class="material-icons text-6xl text-gray-300">inbox</span>
+      <i data-lucide="inbox" class="w-16 h-16 text-gray-300 mx-auto"></i>
       <h3 class="mt-4 text-lg font-medium text-gray-900">カードがありません</h3>
       <p class="mt-2 text-gray-500">新しいカードを作成してみましょう</p>
-      <a href="{{ route('cards.create') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-      <span class="material-icons text-sm mr-2">add</span>
+      <a href="{{ route('cards.create') }}" class="mt-4 inline-flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast">
+      <i data-lucide="plus" class="w-4 h-4"></i>
       カードを作成
       </a>
   </div>
 @else
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @foreach($cards as $card)
-      <div class="relative card bg-white rounded-lg shadow-md hover:shadow-xl overflow-hidden">
+      <div class="relative card bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:bg-gray-100">
           <!-- お気に入りボタン -->
           <button 
         onclick="event.preventDefault(); toggleFavorite('{{ $card['id'] }}', this)" 
-        class="absolute top-3 right-3 z-10 p-2 rounded-full hover:bg-gray-100 transition-colors"
+        class="absolute top-3 right-3 z-10 p-2 rounded-full hover:bg-white transition-all"
         data-favorited="{{ $card['isFavorited'] ? 'true' : 'false' }}"
         title="{{ $card['isFavorited'] ? 'お気に入りから削除' : 'お気に入りに追加' }}"
           >
-        <span class="material-icons text-2xl {{ $card['isFavorited'] ? 'text-red-500' : 'text-gray-300' }}">
-            {{ $card['isFavorited'] ? 'favorite' : 'favorite_border' }}
-        </span>
+        <i data-lucide="heart" class="w-6 h-6 {{ $card['isFavorited'] ? 'text-error fill-error' : 'text-gray-300' }}"></i>
           </button>
 
           <a href="{{ route('cards.show', $card['id']) }}" class="block p-6 pt-12">
@@ -76,8 +74,8 @@
         </h3>
         
         @if($card['company'])
-            <p class="text-sm text-gray-600 mb-3">
-        <span class="material-icons text-sm align-middle">business</span>
+            <p class="text-sm text-gray-600 mb-3 flex items-center gap-1">
+        <i data-lucide="building-2" class="w-4 h-4"></i>
         {{ $card['company'] }}
             </p>
         @endif
@@ -98,8 +96,8 @@
         @endif
         
         <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-            <span class="flex items-center">
-        <span class="material-icons text-sm mr-1">schedule</span>
+            <span class="flex items-center gap-1">
+        <i data-lucide="calendar" class="w-4 h-4"></i>
         {{ \Carbon\Carbon::parse($card['createdAt'])->format('Y/m/d') }}
             </span>
         </div>
@@ -130,14 +128,49 @@ async function toggleFavorite(cardId, button) {
     if (!response.ok) throw new Error('Failed to toggle favorite');
 
     const data = await response.json();
-    const icon = button.querySelector('.material-icons');
     const isFavorited = data.isFavorited;
-
-    // アイコンと色を更新
-    icon.textContent = isFavorited ? 'favorite' : 'favorite_border';
-    icon.className = `material-icons text-2xl ${isFavorited ? 'text-red-500' : 'text-gray-300'}`;
+    
+    // ボタンの属性を更新
     button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
     button.setAttribute('title', isFavorited ? 'お気に入りから削除' : 'お気に入りに追加');
+    
+    // SVG要素を直接探して更新（Lucideで変換済みの場合）
+    let icon = button.querySelector('svg.lucide-heart');
+    
+    if (icon) {
+      // SVGが既に存在する場合、クラスとスタイルを更新
+      if (isFavorited) {
+        icon.className = 'lucide lucide-heart w-6 h-6 text-error';
+        icon.style.fill = 'currentColor';
+      } else {
+        icon.className = 'lucide lucide-heart w-6 h-6 text-gray-300';
+        icon.style.fill = 'none';
+      }
+    } else {
+      // SVGがない場合、<i>タグを探して再作成
+      const oldIcon = button.querySelector('i[data-lucide="heart"]');
+      if (oldIcon) {
+        const newIcon = document.createElement('i');
+        newIcon.setAttribute('data-lucide', 'heart');
+        newIcon.className = 'w-6 h-6 text-error';
+        oldIcon.replaceWith(newIcon);
+        
+        // Lucideアイコンを初期化
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+          
+          // 初期化後、SVGを取得してfillを設定
+          setTimeout(() => {
+            const svg = button.querySelector('svg.lucide-heart');
+            if (svg && isFavorited) {
+              svg.style.fill = 'currentColor';
+            } else if (svg) {
+              svg.style.fill = 'none';
+            }
+          }, 10);
+        }
+      }
+    }
 
   } catch (error) {
     console.error('お気に入り操作エラー:', error);

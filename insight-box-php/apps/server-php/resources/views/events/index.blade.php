@@ -2,103 +2,80 @@
 
 @section('content')
 <div class="mb-8 flex justify-between items-center">
-  <h1 class="text-3xl font-bold text-gray-900">イベント一覧</h1>
-  <a href="{{ route('events.create') }}" class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">
-      <span class="material-icons mr-2">add</span>
-      イベントを追加
+  <h1 class="text-[28px] font-semibold text-text-main leading-tight">イベント一覧</h1>
+  <a href="{{ route('events.create') }}" class="flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    イベントを追加
   </a>
 </div>
 
 @if(empty($events))
-  <div class="bg-white rounded-lg shadow p-12 text-center">
-      <span class="material-icons text-6xl text-gray-300">event</span>
-      <h3 class="mt-4 text-lg font-medium text-gray-900">イベントがありません</h3>
-      <p class="mt-2 text-gray-500">新しいイベントを作成してみましょう</p>
-      <a href="{{ route('events.create') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-      <span class="material-icons text-sm mr-2">add</span>
+  <div class="bg-surface rounded-card shadow-card p-12 text-center">
+    <i data-lucide="calendar" class="w-16 h-16 text-divider mx-auto mb-4"></i>
+    <h3 class="mt-4 text-lg font-medium text-text-main">イベントがありません</h3>
+    <p class="mt-2 text-text-subtle leading-relaxed">新しいイベントを作成してみましょう</p>
+    <a href="{{ route('events.create') }}" class="mt-4 inline-flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary">
+      <i data-lucide="plus" class="w-4 h-4"></i>
       イベントを作成
-      </a>
+    </a>
   </div>
 @else
-  <div class="bg-white rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
+  <div class="bg-surface rounded-card shadow-card overflow-hidden">
+    <table class="min-w-full divide-y divide-divider">
       <thead class="bg-gray-50">
-          <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <tr>
+          <th class="px-6 py-3 text-left text-[13px] font-medium text-text-subtle uppercase tracking-wider">
             イベント名
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          </th>
+          <th class="px-6 py-3 text-left text-[13px] font-medium text-text-subtle uppercase tracking-wider">
+            期間
+          </th>
+          <th class="px-6 py-3 text-left text-[13px] font-medium text-text-subtle uppercase tracking-wider">
             場所
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            開始日
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            終了日
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            説明
-        </th>
-        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+          </th>
+          <th class="px-6 py-3 text-right text-[13px] font-medium text-text-subtle uppercase tracking-wider">
             操作
-        </th>
-          </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-          @foreach($events as $event)
-        <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4">
-        <div class="text-sm font-medium text-gray-900">
-            {{ $event['name'] }}
-        </div>
-            </td>
-            <td class="px-6 py-4">
-        <div class="text-sm text-gray-500">
-            @if(isset($event['location']) && $event['location'])
-                <span class="inline-flex items-center">
-          <span class="material-icons text-xs mr-1">place</span>
-          {{ $event['location'] }}
-                </span>
-            @else
-                -
-            @endif
-        </div>
-            </td>
-            <td class="px-6 py-4">
-        <div class="text-sm text-gray-500">
-            {{ date('Y年m月d日', strtotime($event['start_date'])) }}
-        </div>
-            </td>
-            <td class="px-6 py-4">
-        <div class="text-sm text-gray-500">
-            {{ date('Y年m月d日', strtotime($event['end_date'])) }}
-        </div>
-            </td>
-            <td class="px-6 py-4">
-        <div class="text-sm text-gray-500">
-            {{ $event['description'] ? Str::limit($event['description'], 50) : '-' }}
-        </div>
-            </td>
-            <td class="px-6 py-4 text-right text-sm font-medium">
-        <a href="{{ route('events.edit', $event['id']) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">
-            <span class="material-icons text-sm align-middle">edit</span>
-            編集
-        </a>
-        <form action="{{ route('events.destroy', $event['id']) }}" method="POST" class="inline" 
-              onsubmit="return confirm('このイベントを削除してもよろしいですか？');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="text-red-600 hover:text-red-900">
-                <span class="material-icons text-sm align-middle">delete</span>
-                削除
-            </button>
-        </form>
-            </td>
+          </th>
         </tr>
-          @endforeach
+      </thead>
+      <tbody class="bg-surface divide-y divide-divider">
+        @foreach($events as $event)
+        <tr class="hover:bg-gray-100 transition-all duration-200">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-text-main">{{ $event['name'] }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-text-subtle">
+              {{ \Carbon\Carbon::parse($event['start_date'] ?? $event['startDate'])->format('Y/m/d') }} 〜 
+              {{ \Carbon\Carbon::parse($event['end_date'] ?? $event['endDate'])->format('Y/m/d') }}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-text-subtle">{{ $event['location'] ?? '未設定' }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <a href="{{ route('events.edit', $event['id']) }}" class="text-primary hover:bg-white rounded inline-flex items-center gap-1 mr-3 transition-all px-2 py-1">
+              <i data-lucide="pencil" class="w-4 h-4"></i>
+              編集
+            </a>
+            <form action="{{ route('events.destroy', $event['id']) }}" method="POST" class="inline" onsubmit="return confirm('本当に削除しますか？')">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="text-error hover:bg-white rounded inline-flex items-center gap-1 transition-all px-2 py-1">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                削除
+              </button>
+            </form>
+          </td>
+        </tr>
+        @endforeach
       </tbody>
-      </table>
+    </table>
   </div>
 @endif
-@endsection
 
+<script>
+  // Lucide Icons初期化
+  lucide.createIcons();
+</script>
+@endsection

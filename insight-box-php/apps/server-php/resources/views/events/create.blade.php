@@ -107,9 +107,9 @@
       <a href="{{ route('events.index') }}" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
           キャンセル
       </a>
-      <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">
-          <span class="material-icons text-sm align-middle mr-1">save</span>
-          作成
+      <button type="submit" class="flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          保存する
       </button>
       </div>
   </form>

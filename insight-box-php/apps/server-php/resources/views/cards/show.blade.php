@@ -6,8 +6,8 @@
 <div class="mx-auto">
   <!-- ヘッダー -->
   <div class="mb-6 flex items-center justify-between">
-      <a href="{{ route('cards.index') }}" class="flex items-center text-gray-600 hover:text-gray-900">
-      <span class="material-icons mr-1">arrow_back</span>
+      <a href="{{ route('cards.index') }}" class="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+      <i data-lucide="chevron-left" class="w-4 h-4"></i>
       一覧に戻る
       </a>
       <div class="flex items-center space-x-2">
@@ -15,25 +15,23 @@
       <button 
           id="favorite-btn"
           onclick="toggleFavorite('{{ $card['id'] }}')" 
-          class="flex items-center px-4 py-2 {{ $isFavorited ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-200 hover:bg-gray-300' }} text-white rounded-md transition-colors"
+          class="flex items-center gap-2 h-12 px-4 {{ $isFavorited ? 'bg-error hover:brightness-95' : 'bg-gray-200 hover:bg-gray-300' }} text-white rounded-btn text-sm font-medium transition-fast"
           data-favorited="{{ $isFavorited ? 'true' : 'false' }}"
           title="{{ $isFavorited ? 'お気に入りから削除' : 'お気に入りに追加' }}"
       >
-          <span class="material-icons text-sm mr-1" id="favorite-icon">
-        {{ $isFavorited ? 'favorite' : 'favorite_border' }}
-          </span>
+          <i data-lucide="heart" id="favorite-icon" class="w-4 h-4 {{ $isFavorited ? 'fill-current' : '' }}"></i>
           <span id="favorite-text">{{ $isFavorited ? 'お気に入り済み' : 'お気に入り' }}</span>
       </button>
 
-      <a href="{{ route('cards.edit', $card['id']) }}" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-          <span class="material-icons text-sm mr-1">edit</span>
+      <a href="{{ route('cards.edit', $card['id']) }}" class="flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary">
+          <i data-lucide="pencil" class="w-4 h-4"></i>
           編集
       </a>
       <button 
           onclick="if(confirm('このカードを削除しますか？')) { document.getElementById('delete-form').submit(); }"
-          class="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          class="flex items-center gap-2 h-12 px-4 bg-error text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast"
       >
-          <span class="material-icons text-sm mr-1">delete</span>
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
           削除
       </button>
       <form id="delete-form" action="{{ route('cards.destroy', $card['id']) }}" method="POST" class="hidden">
@@ -52,8 +50,8 @@
       </h1>
       
       @if($card['summary']['company'])
-          <p class="text-lg text-gray-700 mb-4 flex items-center">
-        <span class="material-icons mr-2">business</span>
+          <p class="text-lg text-gray-700 mb-4 flex items-center gap-2">
+        <i data-lucide="building-2" class="w-5 h-5"></i>
         {{ $card['summary']['company'] }}
           </p>
       @endif
@@ -69,12 +67,12 @@
       @endif
       
       <div class="flex items-center space-x-6 text-sm text-gray-500">
-          <span class="flex items-center">
-        <span class="material-icons text-sm mr-1">schedule</span>
+          <span class="flex items-center gap-1">
+        <i data-lucide="calendar" class="w-4 h-4"></i>
         作成: {{ \Carbon\Carbon::parse($card['summary']['createdAt'])->format('Y年m月d日 H:i') }}
           </span>
-          <span class="flex items-center">
-        <span class="material-icons text-sm mr-1">update</span>
+          <span class="flex items-center gap-1">
+        <i data-lucide="clock" class="w-4 h-4"></i>
         更新: {{ \Carbon\Carbon::parse($card['summary']['updatedAt'])->format('Y年m月d日 H:i') }}
           </span>
       </div>
@@ -83,8 +81,8 @@
       <!-- Webクリップ -->
       @if($card['detail']['webclipUrl'])
       <div class="px-8 py-6 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-        <span class="material-icons mr-2">language</span>
+          <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <i data-lucide="globe" class="w-5 h-5"></i>
         Webクリップ
           </h2>
           <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5">
@@ -110,8 +108,8 @@
       <!-- アップロードファイルと抽出テキスト（横並び） -->
       @if($card['detail']['documentId'] || $card['detail']['text'])
       <div class="px-8 py-6 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-        <span class="material-icons mr-2">description</span>
+          <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <i data-lucide="file-text" class="w-5 h-5"></i>
         アップロードファイル
           </h2>
           
@@ -121,7 +119,7 @@
         @if($card['detail']['documentId'])
             <div class="bg-gray-50 rounded-lg p-4">
         <div class="flex items-center gap-3 mb-3">
-            <span class="material-icons text-2xl text-indigo-600">insert_drive_file</span>
+            <i data-lucide="file" class="w-6 h-6 text-primary"></i>
             <div>
                 <p class="font-medium text-gray-900 text-sm">ドキュメントID</p>
                 <p class="text-xs text-gray-500">{{ substr($card['detail']['documentId'], 0, 20) }}...</p>
@@ -138,8 +136,8 @@
                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
             >
             <div style="display:none;" class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p class="text-xs text-blue-800">
-          <span class="material-icons text-xs align-middle">info</span>
+                <p class="text-xs text-blue-800 flex items-center gap-1">
+          <i data-lucide="info" class="w-3 h-3"></i>
           画像プレビューは利用できません
                 </p>
             </div>
@@ -150,8 +148,8 @@
         <!-- 右: 抽出テキスト（PC） / 下: テキスト（SP） -->
         @if($card['detail']['text'])
             <div class="bg-gray-50 rounded-lg p-4 flex flex-col">
-        <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
-            <span class="material-icons text-sm mr-2">text_snippet</span>
+        <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
             抽出されたテキスト
         </h3>
         <div class="bg-white rounded p-3 overflow-y-auto flex-1" id="text-container">
@@ -166,8 +164,8 @@
       <!-- カメラ画像 -->
       @if($card['detail']['cameraImage'])
       <div class="px-8 py-6 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-        <span class="material-icons mr-2">photo_camera</span>
+          <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <i data-lucide="camera" class="w-5 h-5"></i>
         カメラ撮影画像
           </h2>
           <img 
@@ -182,8 +180,8 @@
       <!-- メモ -->
       @if($card['detail']['memo'])
       <div class="px-8 py-6 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-        <span class="material-icons mr-2">edit_note</span>
+          <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <i data-lucide="file-edit" class="w-5 h-5"></i>
         メモ
           </h2>
           <div class="prose max-w-none">
@@ -216,23 +214,60 @@ async function toggleFavorite(cardId) {
 
     const data = await response.json();
     const button = document.getElementById('favorite-btn');
-    const icon = document.getElementById('favorite-icon');
     const text = document.getElementById('favorite-text');
     const isFavorited = data.isFavorited;
 
-    // ボタンのスタイルを更新
-    if (isFavorited) {
-      button.className = 'flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors';
-      icon.textContent = 'favorite';
-      text.textContent = 'お気に入り済み';
-      button.setAttribute('title', 'お気に入りから削除');
-    } else {
-      button.className = 'flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-white rounded-md transition-colors';
-      icon.textContent = 'favorite_border';
-      text.textContent = 'お気に入り';
-      button.setAttribute('title', 'お気に入りに追加');
+    // 要素が存在する場合のみ更新
+    if (button && text) {
+      // ボタンのスタイルを更新
+      if (isFavorited) {
+        button.className = 'flex items-center gap-2 h-12 px-4 bg-error hover:brightness-95 text-white rounded-btn text-sm font-medium transition-fast';
+        text.textContent = 'お気に入り済み';
+        button.setAttribute('title', 'お気に入りから削除');
+      } else {
+        button.className = 'flex items-center gap-2 h-12 px-4 bg-gray-200 hover:bg-gray-300 text-white rounded-btn text-sm font-medium transition-fast';
+        text.textContent = 'お気に入り';
+        button.setAttribute('title', 'お気に入りに追加');
+      }
+      button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
+      
+      // SVG要素を直接探して更新（Lucideで変換済みの場合）
+      let icon = button.querySelector('svg.lucide-heart');
+      
+      if (icon) {
+        // SVGが既に存在する場合、fillスタイルを更新
+        if (isFavorited) {
+          icon.style.fill = 'currentColor';
+        } else {
+          icon.style.fill = 'none';
+        }
+      } else {
+        // SVGがない場合、<i>タグを探して再作成
+        const oldIcon = document.getElementById('favorite-icon');
+        if (oldIcon) {
+          const newIcon = document.createElement('i');
+          newIcon.setAttribute('data-lucide', 'heart');
+          newIcon.id = 'favorite-icon';
+          newIcon.className = 'w-4 h-4';
+          oldIcon.replaceWith(newIcon);
+          
+          // Lucideアイコンを初期化
+          if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+            
+            // 初期化後、SVGを取得してfillを設定
+            setTimeout(() => {
+              const svg = button.querySelector('svg.lucide-heart');
+              if (svg && isFavorited) {
+                svg.style.fill = 'currentColor';
+              } else if (svg) {
+                svg.style.fill = 'none';
+              }
+            }, 10);
+          }
+        }
+      }
     }
-    button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
 
   } catch (error) {
     console.error('お気に入り操作エラー:', error);

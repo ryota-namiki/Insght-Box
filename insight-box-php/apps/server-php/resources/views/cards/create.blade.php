@@ -5,8 +5,8 @@
 @section('content')
 <div class="mx-auto" x-data="cardFormMain()">
   <div class="mb-6">
-      <a href="{{ route('cards.index') }}" class="flex items-center text-gray-600 hover:text-gray-900">
-      <span class="material-icons mr-1">arrow_back</span>
+      <a href="{{ route('cards.index') }}" class="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+      <i data-lucide="chevron-left" class="w-4 h-4"></i>
       一覧に戻る
       </a>
   </div>
@@ -22,27 +22,27 @@
             type="button"
             @click="uploadMode = 'file'"
             :class="uploadMode === 'file' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center"
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2"
         >
-            <span class="material-icons text-sm mr-2">upload_file</span>
+            <i data-lucide="upload" class="w-4 h-4"></i>
             ファイルアップロード
         </button>
         <button 
             type="button"
             @click="uploadMode = 'webclip'"
             :class="uploadMode === 'webclip' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center"
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2"
         >
-            <span class="material-icons text-sm mr-2">language</span>
+            <i data-lucide="globe" class="w-4 h-4"></i>
             Webクリップ
         </button>
         <button 
             type="button"
             @click="uploadMode = 'camera'"
             :class="uploadMode === 'camera' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center"
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2"
         >
-            <span class="material-icons text-sm mr-2">photo_camera</span>
+            <i data-lucide="camera" class="w-4 h-4"></i>
             カメラ撮影
         </button>
           </nav>
@@ -60,7 +60,7 @@
       >
           <template x-if="!uploadedFile">
         <div>
-            <span class="material-icons text-6xl text-gray-400">cloud_upload</span>
+            <i data-lucide="cloud-upload" class="w-16 h-16 text-gray-400 mx-auto"></i>
             <p class="mt-4 text-lg font-medium text-gray-700">ファイルをドラッグ＆ドロップ</p>
             <p class="mt-2 text-sm text-gray-500">または</p>
             <button 
@@ -84,7 +84,7 @@
           <template x-if="uploadedFile">
         <div>
             <div class="flex items-center justify-center mb-4">
-        <span class="material-icons text-4xl text-green-600">check_circle</span>
+        <i data-lucide="check-circle" class="w-10 h-10 text-success"></i>
             </div>
             <p class="font-medium text-gray-900" x-text="uploadedFile.name"></p>
             <p class="text-sm text-gray-500" x-text="formatFileSize(uploadedFile.size)"></p>
@@ -135,9 +135,9 @@
             type="button"
             @click="fetchWebContent()"
             :disabled="isProcessing || !webclipUrl"
-            class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-gray-400 flex items-center"
+            class="flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary disabled:opacity-50"
         >
-            <span class="material-icons text-sm mr-1" x-show="!isProcessing">download</span>
+            <i data-lucide="download" class="w-4 h-4" x-show="!isProcessing"></i>
             <span x-show="!isProcessing">取得</span>
             <span x-show="isProcessing">処理中...</span>
         </button>
@@ -145,8 +145,8 @@
           
           <template x-if="webclipContent">
         <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div class="flex items-center mb-3">
-        <span class="material-icons text-green-600 mr-2">check_circle</span>
+            <div class="flex items-center gap-2 mb-3">
+        <i data-lucide="check-circle" class="w-5 h-5 text-success"></i>
         <span class="font-medium text-green-900">Webページを取得しました</span>
             </div>
             <div class="mt-3 space-y-3">
@@ -167,14 +167,14 @@
       <div x-show="uploadMode === 'camera'" x-cloak class="mb-8">
       <div class="border-2 border-gray-300 rounded-lg p-6 text-center">
           <div x-show="!cameraImage && !showCamera">
-        <span class="material-icons text-6xl text-gray-400">photo_camera</span>
+        <i data-lucide="camera" class="w-16 h-16 text-gray-400 mx-auto"></i>
         <p class="mt-4 text-lg font-medium text-gray-700">カメラで撮影する</p>
         <button 
             type="button"
             @click="startCamera()"
-            class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center mx-auto"
+            class="mt-4 flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary mx-auto"
         >
-            <span class="material-icons text-sm mr-2">videocam</span>
+            <i data-lucide="video" class="w-4 h-4"></i>
             カメラを起動
         </button>
           </div>
@@ -185,9 +185,9 @@
             <button 
         type="button"
         @click="captureImage()"
-        class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center"
+        class="flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary"
             >
-        <span class="material-icons mr-2">camera</span>
+        <i data-lucide="camera" class="w-4 h-4"></i>
         撮影
             </button>
             <button 
@@ -335,10 +335,10 @@
           </a>
           <button 
         type="submit" 
-        class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center"
+        class="flex items-center gap-2 h-12 px-4 bg-primary text-white rounded-btn text-sm font-medium hover:brightness-95 transition-fast btn-primary"
           >
-        <span class="material-icons text-sm mr-2">add</span>
-        作成
+        <i data-lucide="save" class="w-4 h-4"></i>
+        保存する
           </button>
       </div>
       </form>

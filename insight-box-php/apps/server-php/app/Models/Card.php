@@ -14,6 +14,7 @@ class Card extends Model
 
   protected $fillable = [
     'id',
+    'board_id',
     'owner_user_id',
     'team_id',
     'visibility',
@@ -62,6 +63,14 @@ class Card extends Model
   public function team()
   {
     return $this->belongsTo(Team::class);
+  }
+
+  /**
+   * ボード
+   */
+  public function board()
+  {
+    return $this->belongsTo(Board::class, 'board_id');
   }
 
   /**

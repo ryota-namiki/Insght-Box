@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{DocumentController, JobController, CardController};
+use App\Http\Controllers\{DocumentController, JobController, CardController, BoardController};
 use App\Repositories\EventRepository;
 
 Route::post('/v1/documents', [DocumentController::class, 'store']);
@@ -15,8 +15,12 @@ Route::get('/cards', [CardController::class, 'index']);
 Route::post('/cards', [CardController::class, 'store']);
 Route::get('/cards/{id}', [CardController::class, 'show']);
 Route::put('/cards/{id}', [CardController::class, 'update']);
-Route::put('/cards/{id}/position', [CardController::class, 'updatePosition']);
 Route::delete('/cards/{id}', [CardController::class, 'destroy']);
+
+// Board API
+Route::put('/boards/{boardId}/cards/{id}/position', [BoardController::class, 'updatePosition']);
+Route::post('/boards/{boardId}/cards/{id}', [BoardController::class, 'addToBoard']);
+Route::delete('/boards/{boardId}/cards/{id}', [BoardController::class, 'removeFromBoard']);
 
 // Events API (永続化対応)
 Route::get('/events', function (EventRepository $events) {

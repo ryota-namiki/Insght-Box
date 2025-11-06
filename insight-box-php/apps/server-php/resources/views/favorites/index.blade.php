@@ -7,15 +7,15 @@
   @if(count($cards) > 0)
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     @foreach($cards as $card)
-    <div class="relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+    <div class="relative bg-white rounded-lg shadow-md transition-all duration-200 hover:bg-gray-100">
       <!-- お気に入りボタン -->
       <button 
         onclick="event.preventDefault(); toggleFavorite('{{ $card['id'] }}', this)" 
-        class="absolute top-3 right-3 z-10 p-2 rounded-full hover:bg-gray-100 transition-colors"
+        class="absolute top-3 right-3 z-10 p-2 rounded-full hover:bg-white transition-all"
         data-favorited="true"
         title="お気に入りから削除"
       >
-        <span class="material-icons text-2xl text-red-500">favorite</span>
+        <i data-lucide="heart" class="w-6 h-6 text-error fill-error"></i>
       </button>
 
       <a href="{{ route('cards.show', $card['id']) }}" class="block p-6 pt-12">
@@ -24,8 +24,8 @@
         </h3>
 
         @if($card['company'])
-        <p class="text-gray-600 mb-2 flex items-center">
-          <span class="material-icons text-sm mr-1">business</span>
+        <p class="text-gray-600 mb-2 flex items-center gap-1">
+          <i data-lucide="building-2" class="w-4 h-4"></i>
           {{ $card['company'] }}
         </p>
         @endif
@@ -46,8 +46,8 @@
         @endif
 
         <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-          <span class="flex items-center">
-            <span class="material-icons text-sm mr-1">schedule</span>
+          <span class="flex items-center gap-1">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
             お気に入り登録: {{ \Carbon\Carbon::parse($card['favoritedAt'])->format('Y/m/d') }}
           </span>
         </div>
@@ -85,15 +85,26 @@ async function toggleFavorite(cardId, button) {
     
     if (data.success && !data.isFavorited) {
       // お気に入りから削除された場合、カードを非表示にする
-      button.closest('.relative').style.opacity = '0';
-      setTimeout(() => {
+      const card = button.closest('.relative');
+      if (card) {
+        card.style.opacity = '0';
+        setTimeout(() => {
+          location.reload();
+        }, 300);
+      } else {
+        // カード要素が見つからない場合は即座にリロード
         location.reload();
-      }, 300);
+      }
     }
   } catch (error) {
     console.error('お気に入り操作エラー:', error);
     alert('お気に入り操作に失敗しました');
   }
+}
+
+// Lucideアイコンの初期化
+if (typeof lucide !== 'undefined') {
+  lucide.createIcons();
 }
 </script>
 @endsection

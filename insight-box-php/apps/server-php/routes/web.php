@@ -47,8 +47,14 @@ Route::middleware('auth')->group(function () {
   Route::put('/cards/{id}', [CardController::class, 'updateWeb'])->name('cards.update');
   Route::delete('/cards/{id}', [CardController::class, 'destroyWeb'])->name('cards.destroy');
 
-  // ボードビュー
-  Route::get('/board', [BoardController::class, 'index'])->name('board.index');
+  // ボード管理
+  Route::get('/boards', [BoardController::class, 'list'])->name('board.list');
+  Route::get('/boards/create', [BoardController::class, 'create'])->name('board.create');
+  Route::post('/boards', [BoardController::class, 'store'])->name('board.store');
+  Route::get('/boards/{id}', [BoardController::class, 'show'])->name('board.show');
+  Route::get('/boards/{id}/edit', [BoardController::class, 'edit'])->name('board.edit');
+  Route::put('/boards/{id}', [BoardController::class, 'update'])->name('board.update');
+  Route::delete('/boards/{id}', [BoardController::class, 'destroy'])->name('board.destroy');
 
   // イベント管理
   Route::get('/events', [EventController::class, 'index'])->name('events.index');

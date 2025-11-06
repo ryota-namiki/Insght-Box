@@ -57,6 +57,7 @@ class CardRepository
   {
     $data = [
       'id' => $id,
+      'board_id' => $record['board_id'] ?? null,
       'owner_user_id' => $record['owner_user_id'] ?? auth()->id(),
       'team_id' => $record['team_id'] ?? null,
       'visibility' => $record['visibility'] ?? 'private',
@@ -76,8 +77,8 @@ class CardRepository
       'likes' => $record['reactions']['likes'] ?? 0,
       'comments' => $record['reactions']['comments'] ?? 0,
       'views' => $record['reactions']['views'] ?? 0,
-      'position_x' => $record['position']['x'] ?? null,
-      'position_y' => $record['position']['y'] ?? null,
+      'position_x' => isset($record['position']) && is_array($record['position']) ? ($record['position']['x'] ?? null) : null,
+      'position_y' => isset($record['position']) && is_array($record['position']) ? ($record['position']['y'] ?? null) : null,
     ];
 
     Card::updateOrCreate(['id' => $id], $data);
@@ -97,13 +98,56 @@ class CardRepository
   }
 
   /**
+   * カードのboard_idとpositionを更新
+   */
+  public function updateBoardAndPosition(string $id, ?string $boardId, ?int $x, ?int $y): void
+  {
+    $data = [];
+    
+    if ($boardId !== null) {
+      $data['board_id'] = $boardId;
+    }
+    
+    if ($x !== null && $y !== null) {
+      $data['position_x'] = $x;
+      $data['position_y'] = $y;
+    }
+    
+    if (!empty($data)) {
+      Card::where('id', $id)->update($data);
+    }
+  }
+
+  /**
+   * カードのboard_idをクリア（positionもクリア）
+   */
+  public function clearBoardAndPosition(string $id): void
+  {
+    Card::where('id', $id)->update([
+      'board_id' => null,
+      'position_x' => null,
+      'position_y' => null,
+    ]);
+  }
+
+  /**
    * Convert Card model to array format matching the old JSON structure
    * @return array<string,mixed>
    */
   private function toArray(Card $card): array
   {
+    $position = null;
+    if ($card->position_x !== null && $card->position_y !== null) {
+      $position = [
+        'x' => $card->position_x,
+        'y' => $card->position_y,
+      ];
+    }
+
     return [
       'id' => $card->id,
+      'board_id' => $card->board_id,
+      'owner_user_id' => $card->owner_user_id,
       'summary' => [
         'id' => $card->id,
         'title' => $card->title,
@@ -132,10 +176,7 @@ class CardRepository
       ],
       'timeseries' => [],
       'audience' => [],
-      'position' => [
-        'x' => $card->position_x ?? 0,
-        'y' => $card->position_y ?? 0,
-      ],
+      'position' => $position,
       'updated_at' => $card->updated_at->toIso8601String(),
     ];
   }
