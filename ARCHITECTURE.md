@@ -8,9 +8,10 @@
 5. [データフロー](#データフロー)
 6. [主要機能の実装](#主要機能の実装)
 7. [データベース設計](#データベース設計)
-8. [認証・セキュリティ](#認証セキュリティ)
-9. [外部API連携](#外部api連携)
-10. [開発・デプロイフロー](#開発デプロイフロー)
+8. [JSONファイルベースのデータストレージ](#jsonファイルベースのデータストレージ)
+9. [認証・セキュリティ](#認証セキュリティ)
+10. [外部API連携](#外部api連携)
+11. [開発・デプロイフロー](#開発デプロイフロー)
 
 ---
 
@@ -160,6 +161,10 @@ insight-box-php/apps/server-php/
 │
 ├── storage/
 │   ├── app/
+│   │   ├── data/                # JSONファイルベースのデータストレージ
+│   │   │   ├── documents.json   # ドキュメント情報（OCR処理結果含む）
+│   │   │   ├── jobs.json        # OCR処理ジョブの状態管理
+│   │   │   └── events.json      # イベント情報（データベースへ移行済み）
 │   │   ├── private/             # プライベートファイル
 │   │   ├── public/              # パブリックファイル
 │   │   └── uploads/             # アップロードファイル
@@ -512,19 +517,22 @@ public function store(Request $req, DocumentRepository $docs, JobRepository $job
         Storage::disk('local')->put($storedPath, $content);
     }
     
-    // 4. ドキュメント情報を保存
+    // 4. ドキュメント情報を storage/app/data/documents.json に保存
     $docs->upsert($documentId, [
         'id' => $documentId,
         'source_type' => $req->hasFile('file') ? 'upload' : 'url',
         'path' => $storedPath,
+        'url' => $validated['url'] ?? null,
         'lang' => $validated['lang'] ?? 'jpn+eng',
+        'text' => null,  // OCR処理後に更新される
+        'created_at' => now()->toIso8601String(),
     ]);
     
-    // 5. OCR処理を実行
+    // 5. OCR処理を実行（非同期または同期）
     $ocrService = app(OcrService::class);
-    $text = $ocrService->imageOrTextToText($path, $validated['lang'] ?? 'jpn+eng');
+    $text = $ocrService->imageOrTextToText($storedPath, $validated['lang'] ?? 'jpn+eng');
     
-    // 6. テキストを保存
+    // 6. OCR処理結果を storage/app/data/documents.json に保存
     $docs->updateText($documentId, $text);
     
     return response()->json([
@@ -533,6 +541,12 @@ public function store(Request $req, DocumentRepository $docs, JobRepository $job
     ]);
 }
 ```
+
+**重要なポイント**:
+- `DocumentRepository::upsert()` は `storage/app/data/documents.json` にデータを保存します
+- ファイル本体は `storage/app/uploads/{documentId}/` に保存されます
+- OCR処理で抽出されたテキストは `documents.json` の `text` フィールドに保存されます
+- カード作成時、`CardRepository::upsert()` でデータベース（`cards`テーブル）に保存されます
 
 ### 7. お気に入り機能（FavoriteController）
 
@@ -668,6 +682,107 @@ CREATE TABLE events (
     updated_at TIMESTAMP
 );
 ```
+
+---
+
+## JSONファイルベースのデータストレージ
+
+Insight-Boxでは、データベース（SQLite/MySQL）に加えて、**JSONファイル**を使用したデータストレージも採用しています。
+
+### データストレージの構成
+
+#### 1. `storage/app/data/documents.json`
+
+ドキュメント（アップロードファイル、OCR処理結果）の情報を保存します。
+
+**保存場所**: `storage/app/data/documents.json`
+
+**データ構造**:
+```json
+{
+    "document-id-uuid": {
+        "id": "document-id-uuid",
+        "source_type": "upload" | "url",
+        "path": "uploads/{documentId}/{filename}",
+        "url": null | "https://example.com/page.html",
+        "lang": "jpn+eng",
+        "text": "OCR処理で抽出されたテキスト",
+        "created_at": "2025-09-30T13:43:25+00:00",
+        "updated_at": "2025-09-30T13:43:26+00:00"
+    }
+}
+```
+
+**使用箇所**:
+- `DocumentRepository` - ドキュメント情報の永続化
+- `DocumentController::store()` - ファイルアップロード時に保存
+- `OcrProcessJob` - OCR処理完了後にテキストを更新
+
+**実装例**:
+```php
+// DocumentRepository::upsert()
+public function upsert(string $id, array $record): void
+{
+    $all = $this->read();  // documents.jsonを読み込み
+    $all[$id] = $record;   // 新しいドキュメントを追加
+    $this->write($all);    // documents.jsonに書き込み
+}
+
+// DocumentRepository::updateText()
+public function updateText(string $id, string $text): void
+{
+    $all = $this->read();
+    if (isset($all[$id])) {
+        $all[$id]['text'] = $text;
+        $all[$id]['updated_at'] = now()->toIso8601String();
+        $this->write($all);
+    }
+}
+```
+
+#### 2. その他のJSONファイル
+
+以下のJSONファイルも同様の仕組みで管理されています:
+
+- **`storage/app/data/jobs.json`** - OCR処理ジョブの状態管理
+- **`storage/app/data/events.json`** - イベント情報（現在はデータベースへ移行済み）
+
+### JSONファイルストレージの利点
+
+1. **シンプルな実装** - データベース設定不要で開発・テストが容易
+2. **可読性** - JSONファイルは直接編集・確認可能
+3. **軽量** - 小規模データには適している
+4. **バックアップ** - ファイル単位でバックアップが容易
+
+### 注意事項
+
+1. **ファイルサイズ制限** - 大量データには不向き（1ファイルあたり数MB程度が目安）
+2. **同時アクセス** - ファイルロックによる排他制御が必要
+3. **パフォーマンス** - 大量データの検索・集計はデータベースの方が優れている
+4. **トランザクション** - JSONファイルではトランザクション処理が困難
+
+### データフロー（ドキュメント処理）
+
+```
+1. ユーザーがファイルをアップロード
+   ↓
+2. DocumentController::store()
+   ↓
+3. DocumentRepository::upsert()
+   → storage/app/data/documents.json に保存
+   ↓
+4. OcrProcessJob (非同期処理)
+   ↓
+5. OcrService::imageToText() (OCR処理)
+   ↓
+6. DocumentRepository::updateText()
+   → storage/app/data/documents.json を更新
+   ↓
+7. CardRepository::upsert()
+   → データベース（cardsテーブル）に保存
+```
+
+**重要**: カードデータ自体は**データベース（SQLite/MySQL）**に保存されます。`documents.json`は、ドキュメント（アップロードファイル）のメタデータとOCR処理結果を保存するために使用されます。
 
 ---
 

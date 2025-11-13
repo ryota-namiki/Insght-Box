@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Repositories\CardRepository;
 use App\Repositories\BoardRepository;
 use App\Repositories\BoardCardRepository;
+use App\Models\Card;
 
 class BoardController extends Controller
 {
@@ -44,7 +45,7 @@ class BoardController extends Controller
       ->with('success', 'ボードが作成されました');
   }
 
-  public function show(string $id, CardRepository $cardRepo, BoardRepository $boardRepo, BoardCardRepository $boardCardRepo)
+  public function show(string $id, BoardRepository $boardRepo, BoardCardRepository $boardCardRepo)
   {
     $board = $boardRepo->find($id);
 
@@ -56,33 +57,56 @@ class BoardController extends Controller
     $boardCards = $boardCardRepo->getCardsByBoardId($id);
     $boardCardIds = $boardCards->pluck('card_id')->toArray();
 
-    // 全カードを取得（左カラム用 - ユーザーが所有するすべてのカード）
-    $all = $cardRepo->read();
+    $userId = auth()->id();
+
+    // 左カラム用のカードを取得
+    // ユーザーが所有するカード または お気に入り登録されているカード
+    $cardModels = Card::where(function ($query) use ($userId) {
+        $query->where('owner_user_id', $userId)
+              ->orWhereHas('favorites', function ($q) use ($userId) {
+                  $q->where('user_id', $userId);
+              });
+      })
+      ->orderBy('created_at', 'desc')
+      ->get();
+
     $cards = [];
 
-    foreach ($all as $card) {
-      // ユーザーが所有するカードのみを表示
-      if (($card['owner_user_id'] ?? null) === auth()->id()) {
-        $summary = $card['summary'] ?? [];
-        $summary['reactions'] = $card['reactions'] ?? ['likes' => 0, 'comments' => 0, 'views' => 0];
-        
-        // このボードに配置されているかどうかをチェック
-        $onBoard = in_array($card['id'], $boardCardIds);
-        $summary['onThisBoard'] = $onBoard;
-        
-        // ボードに配置されている場合は、ボード上の位置を設定
-        if ($onBoard) {
-          $boardCard = $boardCards->firstWhere('card_id', $card['id']);
-          $summary['position'] = [
-            'x' => $boardCard->position_x,
-            'y' => $boardCard->position_y,
-          ];
-        } else {
-          $summary['position'] = null;
-        }
-        
-        $cards[] = $summary;
+    foreach ($cardModels as $card) {
+      $summary = [
+        'id' => $card->id,
+        'title' => $card->title,
+        'company' => $card->company,
+        'tags' => $card->tags ?? [],
+        'eventId' => $card->event_id,
+        'authorId' => $card->author_id,
+        'status' => $card->status,
+        'createdAt' => $card->created_at->toIso8601String(),
+        'updatedAt' => $card->updated_at->toIso8601String(),
+      ];
+      
+      $summary['reactions'] = [
+        'likes' => $card->likes ?? 0,
+        'comments' => $card->comments ?? 0,
+        'views' => $card->views ?? 0,
+      ];
+      
+      // このボードに配置されているかどうかをチェック
+      $onBoard = in_array($card->id, $boardCardIds);
+      $summary['onThisBoard'] = $onBoard;
+      
+      // ボードに配置されている場合は、ボード上の位置を設定
+      if ($onBoard) {
+        $boardCard = $boardCards->firstWhere('card_id', $card->id);
+        $summary['position'] = [
+          'x' => $boardCard->position_x,
+          'y' => $boardCard->position_y,
+        ];
+      } else {
+        $summary['position'] = null;
       }
+      
+      $cards[] = $summary;
     }
 
     return view('board.index', compact('board', 'cards'));
