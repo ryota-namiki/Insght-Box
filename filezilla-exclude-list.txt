@@ -1,0 +1,31 @@
+# FileZilla除外リスト
+# このファイルの内容をFileZillaの「ディレクトリ比較」→「フィルタ」に設定
+
+# 除外するディレクトリ
+vendor/
+node_modules/
+.git/
+.idea/
+.vscode/
+tests/
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*.php
+
+# 除外するファイル
+.env
+.DS_Store
+Thumbs.db
+*.log
+database.sqlite
+database.sqlite-journal
+npm-debug.log
+yarn-error.log
+.phpunit.result.cache
+
+# バックアップファイル
+*.backup
+storage/app/data/backup/*
+

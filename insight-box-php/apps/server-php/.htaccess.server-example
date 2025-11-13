@@ -1,0 +1,29 @@
+# Laravel .htaccess for production server
+# public_html (ドキュメントルート) に配置する場合
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Laravelのpublicディレクトリにリダイレクト
+    # /home/username/laravel/public がLaravelのpublicディレクトリの場合
+    RewriteCond %{REQUEST_URI} !^/laravel/public/
+    RewriteRule ^(.*)$ /laravel/public/$1 [L]
+
+    # HTTPS強制（必要に応じてコメント解除）
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# セキュリティヘッダー
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# .envファイルへのアクセスを拒否
+<Files .env>
+    Order allow,deny
+    Deny from all
+</Files>
+
