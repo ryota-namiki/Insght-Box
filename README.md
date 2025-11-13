@@ -21,22 +21,75 @@ PHPのみで実装された、シンプルで高速なカード管理システ�
 ## 📁 プロジェクト構成
 
 ```
-insight-box-php/apps/server-php/
-├── app/                    # PHPコード
-│   ├── Http/Controllers/   # コントローラー
-│   ├── Models/             # Eloquentモデル
-│   ├── Repositories/       # リポジトリパターン
-│   ├── Services/           # ビジネスロジック
-│   └── Console/Commands/   # Artisanコマンド
-├── resources/views/        # Bladeテンプレート
-│   ├── layouts/            # 共通レイアウト
-│   ├── cards/              # カード画面
-│   └── board/              # ボード画面
-├── routes/
-│   ├── web.php             # Web画面ルート
-│   └── api.php             # APIルート
-├── database/migrations/    # マイグレーション
-└── public/                 # 公開ディレクトリ
+insight-box02/
+├── ARCHITECTURE.md              # アーキテクチャ・引き継ぎドキュメント
+├── DOCUMENTATION_INDEX.md       # ドキュメント一覧
+├── FILEZILLA_SIMPLE_GUIDE.md   # FileZillaデプロイガイド
+├── README.md                    # プロジェクト概要（このファイル）
+├── docs/
+│   └── future/                  # 将来実装予定の機能
+│       └── LARAVEL_AUTH_TEAM_DESIGN.md
+├── 資料/                        # 設計書・資料
+│   ├── insight-box-php-設計書.pdf
+│   └── ...
+└── insight-box-php/apps/server-php/
+    ├── app/                     # アプリケーションコード
+    │   ├── Console/
+    │   │   └── Commands/        # Artisanコマンド
+    │   ├── DTO/                 # データ転送オブジェクト
+    │   ├── Http/
+    │   │   ├── Controllers/     # HTTPコントローラー
+    │   │   └── Requests/        # フォームリクエスト
+    │   ├── Jobs/                # 非同期ジョブ
+    │   ├── Models/              # Eloquentモデル
+    │   ├── Policies/            # 認可ポリシー
+    │   ├── Providers/           # サービスプロバイダー
+    │   ├── Repositories/        # リポジトリパターン
+    │   └── Services/            # ビジネスロジック
+    ├── bootstrap/               # ブートストラップ
+    │   ├── app.php
+    │   ├── cache/               # キャッシュファイル
+    │   └── providers.php
+    ├── config/                  # 設定ファイル
+    ├── database/
+    │   ├── factories/           # ファクトリー
+    │   ├── migrations/          # マイグレーション
+    │   └── seeders/             # シーダー
+    ├── public/                  # 公開ディレクトリ
+    │   ├── index.php
+    │   ├── favicon.ico
+    │   └── robots.txt
+    ├── resources/views/         # Bladeテンプレート
+    │   ├── layouts/             # 共通レイアウト
+    │   ├── auth/                # 認証画面
+    │   ├── cards/               # カード画面
+    │   ├── board/               # ボード画面
+    │   ├── events/              # イベント画面
+    │   └── favorites/           # お気に入り画面
+    ├── routes/
+    │   ├── web.php              # Webルート（認証付き）
+    │   ├── api.php              # APIルート
+    │   └── console.php          # コンソールルート
+    ├── storage/                 # ストレージ
+    │   ├── app/
+    │   │   ├── data/            # データファイル
+    │   │   ├── private/         # プライベートファイル
+    │   │   ├── public/          # パブリックファイル
+    │   │   └── uploads/         # アップロードファイル
+    │   ├── framework/
+    │   │   ├── cache/           # フレームワークキャッシュ
+    │   │   ├── sessions/        # セッションファイル
+    │   │   ├── testing/         # テストファイル
+    │   │   └── views/           # コンパイル済みビュー
+    │   └── logs/                # ログファイル
+    ├── tests/                   # テスト
+    │   ├── Feature/             # 機能テスト
+    │   └── Unit/                # ユニットテスト
+    ├── vendor/                  # Composer依存関係
+    ├── artisan                  # Artisanコマンド
+    ├── composer.json            # Composer設定
+    ├── composer.lock            # Composerロックファイル
+    └── phpunit.xml              # PHPUnit設定
 ```
 
 ---
@@ -278,8 +331,18 @@ php artisan route:list
 
 ## 📚 ドキュメント
 
-- **FILEZILLA_SIMPLE_GUIDE.md** - サーバーデプロイ完全ガイド
-- **README.md** - このファイル
+### 必須ドキュメント
+- **ARCHITECTURE.md** - システム全体のアーキテクチャ・引き継ぎドキュメント
+- **FILEZILLA_SIMPLE_GUIDE.md** - サーバーデプロイ完全ガイド（FileZilla手順）
+- **README.md** - プロジェクト概要（このファイル）
+
+### ドキュメント一覧
+- **DOCUMENTATION_INDEX.md** - ドキュメント一覧・整理状況
+
+### 将来実装予定
+- **docs/future/LARAVEL_AUTH_TEAM_DESIGN.md** - 認証・チーム機能の設計書（将来実装予定）
+
+詳細は **ARCHITECTURE.md** の「関連ドキュメント」セクションを参照してください。
 
 ---
 
