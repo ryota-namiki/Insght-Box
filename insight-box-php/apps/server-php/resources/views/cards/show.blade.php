@@ -113,11 +113,11 @@
         アップロードファイル
           </h2>
           
-          <!-- PC: 横並び / SP: 縦並び -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <!-- 左: ファイルプレビュー（PC） / 上: プレビュー（SP） -->
+          <!-- 横並びレイアウト（flex） -->
+          <div class="flex flex-col md:flex-row gap-6 items-start">
+        <!-- 左: ファイルイメージ -->
         @if($card['detail']['documentId'])
-            <div class="bg-gray-50 rounded-lg p-4">
+            <div class="bg-gray-50 rounded-lg p-4 w-full {{ ($card['detail']['documentId'] && $card['detail']['text']) ? 'md:w-1/2' : 'md:w-full' }}">
         <div class="flex items-center gap-3 mb-3">
             <i data-lucide="file" class="w-6 h-6 text-primary"></i>
             <div>
@@ -145,14 +145,14 @@
             </div>
         @endif
         
-        <!-- 右: 抽出テキスト（PC） / 下: テキスト（SP） -->
+        <!-- 右: 抽出されたテキスト -->
         @if($card['detail']['text'])
-            <div class="bg-gray-50 rounded-lg p-4 flex flex-col">
+            <div class="bg-gray-50 rounded-lg p-4 flex flex-col w-full {{ ($card['detail']['documentId'] && $card['detail']['text']) ? 'md:w-1/2' : 'md:w-full' }}">
         <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <i data-lucide="file-text" class="w-4 h-4"></i>
             抽出されたテキスト
         </h3>
-        <div class="bg-white rounded p-3 overflow-y-auto flex-1" id="text-container">
+        <div class="bg-white rounded p-3 overflow-y-auto flex-1 min-h-0" id="text-container" style="max-height: 600px;">
             <p class="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed m-0">{{ $card['detail']['text'] }}</p>
         </div>
             </div>
@@ -231,41 +231,51 @@ async function toggleFavorite(cardId) {
       }
       button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
       
-      // SVG要素を直接探して更新（Lucideで変換済みの場合）
-      let icon = button.querySelector('svg.lucide-heart');
-      
-      if (icon) {
-        // SVGが既に存在する場合、fillスタイルを更新
-        if (isFavorited) {
-          icon.style.fill = 'currentColor';
+      // ヘルパー関数：ハートアイコンを更新
+      function updateHeartIcon(svgElement, favorited) {
+        if (!svgElement) return;
+        
+        // 全てのパス要素を取得
+        const paths = svgElement.querySelectorAll('path');
+        if (paths.length === 0) return;
+        
+        if (favorited) {
+          // お気に入り状態：白色で塗りつぶし（ボタン背景が赤なので）
+          svgElement.style.color = '#FFFFFF';
+          svgElement.style.fill = '#FFFFFF';
+          paths.forEach(path => {
+            path.setAttribute('fill', '#FFFFFF');
+            path.setAttribute('stroke', '#FFFFFF');
+          });
         } else {
-          icon.style.fill = 'none';
+          // 非お気に入り状態：白色で塗りつぶしなし（ボタン背景がグレーなので）
+          svgElement.style.color = '#FFFFFF';
+          svgElement.style.fill = 'none';
+          paths.forEach(path => {
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', '#FFFFFF');
+          });
+        }
+      }
+      
+      // SVG要素を直接探して更新（Lucideで変換済みの場合）
+      let svg = button.querySelector('svg.lucide-heart');
+      
+      if (!svg) {
+        // SVGが見つからない場合、<i>タグを探す
+        const iconTag = button.querySelector('i[data-lucide="heart"]') || document.getElementById('favorite-icon');
+        if (iconTag && typeof lucide !== 'undefined') {
+          // Lucideアイコンを初期化
+          lucide.createIcons();
+          // 少し待ってからSVGを取得
+          setTimeout(() => {
+            svg = button.querySelector('svg.lucide-heart');
+            updateHeartIcon(svg, isFavorited);
+          }, 50);
         }
       } else {
-        // SVGがない場合、<i>タグを探して再作成
-        const oldIcon = document.getElementById('favorite-icon');
-        if (oldIcon) {
-          const newIcon = document.createElement('i');
-          newIcon.setAttribute('data-lucide', 'heart');
-          newIcon.id = 'favorite-icon';
-          newIcon.className = 'w-4 h-4';
-          oldIcon.replaceWith(newIcon);
-          
-          // Lucideアイコンを初期化
-          if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-            
-            // 初期化後、SVGを取得してfillを設定
-            setTimeout(() => {
-              const svg = button.querySelector('svg.lucide-heart');
-              if (svg && isFavorited) {
-                svg.style.fill = 'currentColor';
-              } else if (svg) {
-                svg.style.fill = 'none';
-              }
-            }, 10);
-          }
-        }
+        // SVGが見つかった場合、即座に更新
+        updateHeartIcon(svg, isFavorited);
       }
     }
 

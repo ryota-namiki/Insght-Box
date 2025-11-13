@@ -134,42 +134,55 @@ async function toggleFavorite(cardId, button) {
     button.setAttribute('data-favorited', isFavorited ? 'true' : 'false');
     button.setAttribute('title', isFavorited ? 'お気に入りから削除' : 'お気に入りに追加');
     
-    // SVG要素を直接探して更新（Lucideで変換済みの場合）
-    let icon = button.querySelector('svg.lucide-heart');
-    
-    if (icon) {
-      // SVGが既に存在する場合、クラスとスタイルを更新
-      if (isFavorited) {
-        icon.className = 'lucide lucide-heart w-6 h-6 text-error';
-        icon.style.fill = 'currentColor';
+    // ヘルパー関数：ハートアイコンを更新
+    function updateHeartIcon(svgElement, favorited) {
+      if (!svgElement) return;
+      
+      // 全てのパス要素を取得（heartアイコンは複数のパスで構成される可能性がある）
+      const paths = svgElement.querySelectorAll('path');
+      if (paths.length === 0) return;
+      
+      if (favorited) {
+        // お気に入り状態：赤色で塗りつぶし
+        svgElement.style.color = '#DC2626'; // text-error
+        svgElement.style.fill = '#DC2626';
+        paths.forEach(path => {
+          path.setAttribute('fill', '#DC2626');
+          path.setAttribute('stroke', '#DC2626');
+        });
+        svgElement.classList.remove('text-gray-300');
+        svgElement.classList.add('text-error');
       } else {
-        icon.className = 'lucide lucide-heart w-6 h-6 text-gray-300';
-        icon.style.fill = 'none';
+        // 非お気に入り状態：グレーで塗りつぶしなし
+        svgElement.style.color = '#D1D5DB'; // text-gray-300
+        svgElement.style.fill = 'none';
+        paths.forEach(path => {
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', '#D1D5DB');
+        });
+        svgElement.classList.remove('text-error');
+        svgElement.classList.add('text-gray-300');
+      }
+    }
+    
+    // SVG要素を直接探して更新（Lucideで変換済みの場合）
+    let svg = button.querySelector('svg.lucide-heart');
+    
+    if (!svg) {
+      // SVGが見つからない場合、<i>タグを探す
+      const iconTag = button.querySelector('i[data-lucide="heart"]');
+      if (iconTag && typeof lucide !== 'undefined') {
+        // Lucideアイコンを初期化
+        lucide.createIcons();
+        // 少し待ってからSVGを取得
+        setTimeout(() => {
+          svg = button.querySelector('svg.lucide-heart');
+          updateHeartIcon(svg, isFavorited);
+        }, 50);
       }
     } else {
-      // SVGがない場合、<i>タグを探して再作成
-      const oldIcon = button.querySelector('i[data-lucide="heart"]');
-      if (oldIcon) {
-        const newIcon = document.createElement('i');
-        newIcon.setAttribute('data-lucide', 'heart');
-        newIcon.className = 'w-6 h-6 text-error';
-        oldIcon.replaceWith(newIcon);
-        
-        // Lucideアイコンを初期化
-        if (typeof lucide !== 'undefined') {
-          lucide.createIcons();
-          
-          // 初期化後、SVGを取得してfillを設定
-          setTimeout(() => {
-            const svg = button.querySelector('svg.lucide-heart');
-            if (svg && isFavorited) {
-              svg.style.fill = 'currentColor';
-            } else if (svg) {
-              svg.style.fill = 'none';
-            }
-          }, 10);
-        }
-      }
+      // SVGが見つかった場合、即座に更新
+      updateHeartIcon(svg, isFavorited);
     }
 
   } catch (error) {
@@ -177,6 +190,44 @@ async function toggleFavorite(cardId, button) {
     alert('お気に入り操作に失敗しました');
   }
 }
+
+// ページロード時に初期状態のハートアイコンのfillを設定
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+    
+    // 少し待ってから初期状態を設定
+    setTimeout(() => {
+      document.querySelectorAll('button[data-favorited]').forEach(button => {
+        const isFavorited = button.getAttribute('data-favorited') === 'true';
+        const svg = button.querySelector('svg.lucide-heart');
+        
+        if (svg) {
+          const paths = svg.querySelectorAll('path');
+          if (paths.length > 0) {
+            if (isFavorited) {
+              // お気に入り状態：赤色で塗りつぶし
+              svg.style.color = '#DC2626';
+              svg.style.fill = '#DC2626';
+              paths.forEach(path => {
+                path.setAttribute('fill', '#DC2626');
+                path.setAttribute('stroke', '#DC2626');
+              });
+            } else {
+              // 非お気に入り状態：グレーで塗りつぶしなし
+              svg.style.color = '#D1D5DB';
+              svg.style.fill = 'none';
+              paths.forEach(path => {
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke', '#D1D5DB');
+              });
+            }
+          }
+        }
+      });
+    }, 100);
+  }
+});
 </script>
 @endsection
 
